@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +14,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Seed base roles
+        $this->call(RolesSeeder::class);
 
-        User::factory()->create([
+        // Create a demo user and assign default role
+        $user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Assign default role if exists
+        if (Role::where('name', 'User')->exists()) {
+            $user->assignRole('User');
+        }
     }
 }
