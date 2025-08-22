@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\NotificationsController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -16,6 +17,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admin-only', function () {
         return response('OK', 200);
     })->middleware('role:Admin')->name('admin.only');
+
+    // Notificaciones (DB)
+    Route::get('notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/demo', [NotificationsController::class, 'demo'])->name('notifications.demo');
+    Route::post('notifications/{id}/read', [NotificationsController::class, 'markAsRead'])->name('notifications.read');
 });
 
 require __DIR__.'/settings.php';
