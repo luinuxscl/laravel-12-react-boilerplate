@@ -46,4 +46,26 @@ class UsersController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Mostrar detalle de usuario (admin)
+     */
+    public function show(User $user)
+    {
+        return response()->json(['data' => $user]);
+    }
+
+    /**
+     * Actualizar campos permitidos de un usuario (admin)
+     */
+    public function update(Request $request, User $user)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
+        $user->update($data);
+
+        return response()->json(['data' => $user->fresh()]);
+    }
 }

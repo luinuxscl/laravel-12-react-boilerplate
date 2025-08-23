@@ -29,6 +29,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:Admin')
         ->name('admin.users.index');
 
+    // Detalle y actualización de usuario (solo Admin)
+    Route::get('admin/users/{user}', [UsersController::class, 'show'])
+        ->middleware('role:Admin')
+        ->name('admin.users.show');
+    Route::put('admin/users/{user}', [UsersController::class, 'update'])
+        ->middleware('role:Admin')
+        ->name('admin.users.update');
+
     // Página UI para DataTable de usuarios (solo Admin)
     Route::get('admin/users-ui', function () {
         return Inertia::render('admin/users/index');

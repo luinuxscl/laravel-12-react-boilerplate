@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import DataTable, { Column } from '@/components/tables/DataTable';
 import { useDataTable } from '@/hooks/useDataTable';
 import { useToast } from '@/hooks/useToast';
+import Modal from '@/components/ui/Modal';
 
 interface User {
   id: number;
@@ -17,12 +18,31 @@ export default function AdminUsersPage() {
   const [data, setData] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [meta, setMeta] = useState({ total: 0, per_page: perPage, current_page: page, last_page: 1 });
+  const [editOpen, setEditOpen] = useState(false);
+  const [editing, setEditing] = useState<User | null>(null);
+  const [editName, setEditName] = useState('');
 
   const columns: Column<User>[] = useMemo(() => [
     { key: 'id', header: 'ID' },
     { key: 'name', header: 'Name' },
     { key: 'email', header: 'Email' },
     { key: 'created_at', header: 'Created' },
+    {
+      key: 'actions',
+      header: 'Actions',
+      render: (row: User) => (
+        <button
+          className="rounded-md border px-2 py-1 text-xs"
+          onClick={() => {
+            setEditing(row);
+            setEditName(row.name);
+            setEditOpen(true);
+          }}
+        >
+          Edit
+        </button>
+      ),
+    },
   ], []);
 
   useEffect(() => {
@@ -124,6 +144,60 @@ export default function AdminUsersPage() {
           Next
         </button>
       </div>
+
+      {/* Edit User Modal */}
+      <Modal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        title={editing ? `Edit user #${editing.id}` : 'Edit user'}
+        footer={(
+          <div className="flex items-center justify-end gap-2">
+            <button className="rounded-md border px-3 py-1.5 text-sm" onClick={() => setEditOpen(false)}>Cancel</button>
+            <button
+              className="rounded-md border px-3 py-1.5 text-sm"
+              onClick={async () => {
+                if (!editing) return;
+                try {
+                  const res = await fetch(`/admin/users/${editing.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: JSON.stringify({ name: editName }),
+                  });
+                  if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    const msg = err?.message || `Update failed (${res.status})`;
+                    throw new Error(msg);
+                  }
+                  show({ title: 'Saved', description: 'User updated successfully' });
+                  setEditOpen(false);
+                  // Refresh table
+                  const params = new URLSearchParams({
+                    page: String(page), perPage: String(perPage), search: search || '', sortBy, sortDir,
+                  });
+                  const refetch = await fetch(`/admin/users?${params.toString()}`);
+                  const json = await refetch.json();
+                  setData(json.data as User[]);
+                  setMeta(json.meta);
+                } catch (e: any) {
+                  show({ title: 'Error', description: e.message ?? 'Failed to update user' });
+                }
+              }}
+            >
+              Save
+            </button>
+          </div>
+        )}
+      >
+        <div className="space-y-2">
+          <label className="block text-sm">Name</label>
+          <input
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            className="w-full rounded-md border px-3 py-1.5 text-sm"
+            placeholder="Full name"
+          />
+        </div>
+      </Modal>
     </div>
   );
 }
