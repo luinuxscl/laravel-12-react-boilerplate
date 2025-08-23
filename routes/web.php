@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\UsersController;
+use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -29,6 +30,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:Admin')
         ->name('admin.users.index');
 
+    // Listado de roles (solo Admin)
+    Route::get('admin/roles', function () {
+        return response()->json([
+            'data' => Role::query()->orderBy('name')->pluck('name'),
+        ]);
+    })->middleware('role:Admin')->name('admin.roles.index');
+
     // Detalle y actualización de usuario (solo Admin)
     Route::get('admin/users/{user}', [UsersController::class, 'show'])
         ->middleware('role:Admin')
@@ -36,6 +44,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('admin/users/{user}', [UsersController::class, 'update'])
         ->middleware('role:Admin')
         ->name('admin.users.update');
+    Route::delete('admin/users/{user}', [UsersController::class, 'destroy'])
+        ->middleware('role:Admin')
+        ->name('admin.users.destroy');
 
     // Página UI para DataTable de usuarios (solo Admin)
     Route::get('admin/users-ui', function () {

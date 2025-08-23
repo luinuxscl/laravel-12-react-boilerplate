@@ -21,6 +21,14 @@ export default function AdminUsersPage() {
   const [editOpen, setEditOpen] = useState(false);
   const [editing, setEditing] = useState<User | null>(null);
   const [editName, setEditName] = useState('');
+  const [viewOpen, setViewOpen] = useState(false);
+  const [viewing, setViewing] = useState<User | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState<User | null>(null);
+  const [roles, setRoles] = useState<string[]>([]);
+  const [role, setRole] = useState<string>('');
+  const [createdFrom, setCreatedFrom] = useState<string>('');
+  const [createdTo, setCreatedTo] = useState<string>('');
 
   const columns: Column<User>[] = useMemo(() => [
     { key: 'id', header: 'ID' },
@@ -31,16 +39,36 @@ export default function AdminUsersPage() {
       key: 'actions',
       header: 'Actions',
       render: (row: User) => (
-        <button
-          className="rounded-md border px-2 py-1 text-xs"
-          onClick={() => {
-            setEditing(row);
-            setEditName(row.name);
-            setEditOpen(true);
-          }}
-        >
-          Edit
-        </button>
+        <div className="flex gap-2">
+          <button
+            className="rounded-md border px-2 py-1 text-xs"
+            onClick={() => {
+              setViewing(row);
+              setViewOpen(true);
+            }}
+          >
+            View
+          </button>
+          <button
+            className="rounded-md border px-2 py-1 text-xs"
+            onClick={() => {
+              setEditing(row);
+              setEditName(row.name);
+              setEditOpen(true);
+            }}
+          >
+            Edit
+          </button>
+          <button
+            className="rounded-md border px-2 py-1 text-xs text-red-600"
+            onClick={() => {
+              setDeleting(row);
+              setConfirmOpen(true);
+            }}
+          >
+            Delete
+          </button>
+        </div>
       ),
     },
   ], []);
@@ -56,6 +84,9 @@ export default function AdminUsersPage() {
           search: search || '',
           sortBy,
           sortDir,
+          role: role || '',
+          created_from: createdFrom || '',
+          created_to: createdTo || '',
         });
         const res = await fetch(`/admin/users?${params.toString()}`, { signal: controller.signal });
         if (!res.ok) throw new Error(`Request failed ${res.status}`);
@@ -72,7 +103,16 @@ export default function AdminUsersPage() {
     }
     fetchData();
     return () => controller.abort();
-  }, [page, perPage, search, sortBy, sortDir]);
+  }, [page, perPage, search, sortBy, sortDir, role, createdFrom, createdTo]);
+
+  useEffect(() => {
+    let mounted = true;
+    fetch('/admin/roles')
+      .then((r) => r.json())
+      .then((j) => { if (mounted) setRoles(j.data || []); })
+      .catch(() => {});
+    return () => { mounted = false; };
+  }, []);
 
   useEffect(() => {
     // Keep per_page + current_page in meta synced when perPage changes
@@ -94,6 +134,34 @@ export default function AdminUsersPage() {
           placeholder="Search by name or email"
           className="w-64 rounded-md border px-3 py-1.5 text-sm"
         />
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          className="rounded-md border px-2 py-1 text-sm"
+        >
+          <option value="">All roles</option>
+          {roles.map((r) => (
+            <option key={r} value={r}>{r}</option>
+          ))}
+        </select>
+        <input
+          type="date"
+          value={createdFrom}
+          onChange={(e) => setCreatedFrom(e.target.value)}
+          className="rounded-md border px-2 py-1 text-sm"
+        />
+        <input
+          type="date"
+          value={createdTo}
+          onChange={(e) => setCreatedTo(e.target.value)}
+          className="rounded-md border px-2 py-1 text-sm"
+        />
+        <button
+          className="rounded-md border px-3 py-1.5 text-sm"
+          onClick={() => { setSearch(''); setRole(''); setCreatedFrom(''); setCreatedTo(''); setPage(1); }}
+        >
+          Clear
+        </button>
         <select
           value={perPage}
           onChange={(e) => setPerPage(Number(e.target.value))}
@@ -173,6 +241,7 @@ export default function AdminUsersPage() {
                   // Refresh table
                   const params = new URLSearchParams({
                     page: String(page), perPage: String(perPage), search: search || '', sortBy, sortDir,
+                    role: role || '', created_from: createdFrom || '', created_to: createdTo || '',
                   });
                   const refetch = await fetch(`/admin/users?${params.toString()}`);
                   const json = await refetch.json();
@@ -197,6 +266,59 @@ export default function AdminUsersPage() {
             placeholder="Full name"
           />
         </div>
+      </Modal>
+
+      {/* View User Modal */}
+      <Modal
+        open={viewOpen}
+        onClose={() => setViewOpen(false)}
+        title={viewing ? `User #${viewing.id}` : 'User'}
+        footer={<button className="rounded-md border px-3 py-1.5 text-sm" onClick={() => setViewOpen(false)}>Close</button>}
+      >
+        {viewing && (
+          <div className="space-y-2 text-sm">
+            <div><span className="font-medium">ID:</span> {viewing.id}</div>
+            <div><span className="font-medium">Name:</span> {viewing.name}</div>
+            <div><span className="font-medium">Email:</span> {viewing.email}</div>
+            <div><span className="font-medium">Created:</span> {new Date(viewing.created_at).toLocaleString()}</div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Confirm Delete Modal */}
+      <Modal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title="Confirm delete"
+        footer={(
+          <div className="flex items-center justify-end gap-2">
+            <button className="rounded-md border px-3 py-1.5 text-sm" onClick={() => setConfirmOpen(false)}>Cancel</button>
+            <button
+              className="rounded-md border px-3 py-1.5 text-sm text-red-600"
+              onClick={async () => {
+                if (!deleting) return;
+                try {
+                  const res = await fetch(`/admin/users/${deleting.id}`, { method: 'DELETE', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                  if (!res.ok && res.status !== 204) throw new Error(`Delete failed (${res.status})`);
+                  show({ title: 'Deleted', description: `User #${deleting.id} deleted` });
+                  setConfirmOpen(false);
+                  // Refresh table
+                  const params = new URLSearchParams({ page: String(page), perPage: String(perPage), search: search || '', sortBy, sortDir, role: role || '', created_from: createdFrom || '', created_to: createdTo || '' });
+                  const refetch = await fetch(`/admin/users?${params.toString()}`);
+                  const json = await refetch.json();
+                  setData(json.data as User[]);
+                  setMeta(json.meta);
+                } catch (e: any) {
+                  show({ title: 'Error', description: e.message ?? 'Failed to delete user' });
+                }
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        )}
+      >
+        <div className="text-sm">Are you sure you want to delete this user? This action cannot be undone.</div>
       </Modal>
     </div>
   );

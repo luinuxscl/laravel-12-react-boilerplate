@@ -12,6 +12,18 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
+        // Validación de filtros y parámetros de paginación/orden
+        $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
+            'role' => ['nullable', 'string', 'max:255'],
+            'created_from' => ['nullable', 'date_format:Y-m-d'],
+            'created_to' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:created_from'],
+            'sortBy' => ['nullable', 'in:id,name,email,created_at'],
+            'sortDir' => ['nullable', 'in:asc,desc'],
+            'perPage' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ]);
+
         $query = User::query();
 
         // Filtro de búsqueda simple por nombre o email
@@ -20,6 +32,21 @@ class UsersController extends Controller
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
             });
+        }
+
+        // Filtro por rol (Spatie)
+        if ($role = $request->string('role')->toString()) {
+            $query->whereHas('roles', function ($q) use ($role) {
+                $q->where('name', $role);
+            });
+        }
+
+        // Filtros por fecha de creación (YYYY-MM-DD)
+        if ($from = $request->string('created_from')->toString()) {
+            $query->whereDate('created_at', '>=', $from);
+        }
+        if ($to = $request->string('created_to')->toString()) {
+            $query->whereDate('created_at', '<=', $to);
         }
 
         // Ordenamiento
@@ -67,5 +94,19 @@ class UsersController extends Controller
         $user->update($data);
 
         return response()->json(['data' => $user->fresh()]);
+    }
+
+    /**
+     * Eliminar usuario (admin)
+     */
+    public function destroy(Request $request, User $user)
+    {
+        // Evitar auto-eliminación accidental via endpoint admin
+        if ($request->user()->id === $user->id) {
+            return response()->json(['message' => 'You cannot delete yourself.'], 422);
+        }
+
+        $user->delete();
+        return response()->noContent(); // 204
     }
 }

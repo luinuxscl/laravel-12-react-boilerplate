@@ -19,9 +19,6 @@ export type DataTableProps<T> = {
 };
 
 export function DataTable<T>({ columns, data, loading }: DataTableProps<T>) {
-  if (loading) {
-    return <div className="p-4 text-sm text-muted-foreground">Loading...</div>;
-  }
 
   return (
     <div className="w-full overflow-x-auto">
@@ -36,7 +33,27 @@ export function DataTable<T>({ columns, data, loading }: DataTableProps<T>) {
           </tr>
         </thead>
         <tbody>
-          {data.map((row: any, i) => (
+          {loading && (
+            Array.from({ length: 5 }).map((_, i) => (
+              <tr key={`s-${i}`} className="border-b">
+                {columns.map((c, j) => (
+                  <td key={`${i}-${j}`} className="px-3 py-2">
+                    <div className="h-4 w-full max-w-[140px] animate-pulse rounded bg-muted" />
+                  </td>
+                ))}
+              </tr>
+            ))
+          )}
+
+          {!loading && data.length === 0 && (
+            <tr>
+              <td className="px-3 py-6 text-center text-sm text-muted-foreground" colSpan={columns.length}>
+                No records found
+              </td>
+            </tr>
+          )}
+
+          {!loading && data.map((row: any, i) => (
             <tr key={i} className="border-b hover:bg-muted/30">
               {columns.map((c) => (
                 <td key={String(c.key)} className="px-3 py-2">
