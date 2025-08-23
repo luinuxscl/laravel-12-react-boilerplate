@@ -28,6 +28,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admin/users', [UsersController::class, 'index'])
         ->middleware('role:Admin')
         ->name('admin.users.index');
+
+    // Página UI para DataTable de usuarios (solo Admin)
+    Route::get('admin/users-ui', function () {
+        return Inertia::render('admin/users/index');
+    })->middleware('role:Admin')->name('admin.users.ui');
 });
 
 require __DIR__.'/settings.php';
