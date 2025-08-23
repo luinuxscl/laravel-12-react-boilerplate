@@ -26,6 +26,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('notifications/demo', [NotificationsController::class, 'demo'])->name('notifications.demo');
     Route::post('notifications/{id}/read', [NotificationsController::class, 'markAsRead'])->name('notifications.read');
 
+    // Página UI para Notificaciones
+    Route::get('notifications-ui', function () {
+        return Inertia::render('notifications/index');
+    })->name('notifications.ui');
+
     // DataTable de usuarios (solo Admin)
     Route::get('admin/users', [UsersController::class, 'index'])
         ->middleware('role:Admin')
@@ -53,6 +58,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admin/users-ui', function () {
         return Inertia::render('admin/users/index');
     })->middleware('role:Admin')->name('admin.users.ui');
+
+    // Página UI para Roles (solo Admin)
+    Route::get('admin/roles-ui', function () {
+        return Inertia::render('admin/roles/index');
+    })->middleware('role:Admin')->name('admin.roles.ui');
 
     // Admin Settings (simple CRUD)
     Route::middleware('role:Admin')->group(function () {

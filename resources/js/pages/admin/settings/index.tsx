@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { useToast } from '@/hooks/useToast';
+import AppLayout from '@/layouts/app-layout';
 
 // Read CSRF token from Blade layout meta tag
 const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
@@ -90,12 +91,13 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="space-y-4 p-4">
-      <Head title="Admin · Settings" />
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Settings</h1>
-        <Link href={route('dashboard')} className="text-sm underline">Back to Dashboard</Link>
-      </div>
+    <AppLayout>
+      <div className="space-y-4 p-4">
+        <Head title="Admin · Settings" />
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold">Settings</h1>
+          <Link href={route('dashboard')} className="text-sm underline">Back to Dashboard</Link>
+        </div>
 
       <div className="rounded-md border p-3 space-y-2">
         <div className="text-sm font-medium">Create / Update</div>
@@ -162,6 +164,7 @@ export default function AdminSettingsPage() {
           </tbody>
         </table>
       </div>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

@@ -4,6 +4,7 @@ import DataTable, { Column } from '@/components/tables/DataTable';
 import { useDataTable } from '@/hooks/useDataTable';
 import { useToast } from '@/hooks/useToast';
 import Modal from '@/components/ui/Modal';
+import AppLayout from '@/layouts/app-layout';
 
 // Read CSRF token from Blade layout meta tag
 const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
@@ -123,12 +124,13 @@ export default function AdminUsersPage() {
   }, [perPage, page]);
 
   return (
-    <div className="space-y-4 p-4">
-      <Head title="Admin · Users" />
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Users</h1>
-        <Link href={route('dashboard')} className="text-sm underline">Back to Dashboard</Link>
-      </div>
+    <AppLayout>
+      <div className="space-y-4 p-4">
+        <Head title="Admin · Users" />
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold">Users</h1>
+          <Link href={route('dashboard')} className="text-sm underline">Back to Dashboard</Link>
+        </div>
 
       <div className="flex flex-wrap gap-2 items-center">
         <input
@@ -323,6 +325,7 @@ export default function AdminUsersPage() {
       >
         <div className="text-sm">Are you sure you want to delete this user? This action cannot be undone.</div>
       </Modal>
-    </div>
+      </div>
+    </AppLayout>
   );
 }
