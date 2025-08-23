@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
@@ -52,6 +53,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admin/users-ui', function () {
         return Inertia::render('admin/users/index');
     })->middleware('role:Admin')->name('admin.users.ui');
+
+    // Admin Settings (simple CRUD)
+    Route::middleware('role:Admin')->group(function () {
+        Route::get('admin/settings-ui', [AdminSettingsController::class, 'page'])->name('admin.settings.ui');
+        Route::get('admin/settings', [AdminSettingsController::class, 'index'])->name('admin.settings.index');
+        Route::put('admin/settings', [AdminSettingsController::class, 'update'])->name('admin.settings.update');
+        Route::delete('admin/settings/{key}', [AdminSettingsController::class, 'destroy'])->name('admin.settings.destroy');
+    });
 });
 
 require __DIR__.'/settings.php';

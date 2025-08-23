@@ -5,6 +5,9 @@ import { useDataTable } from '@/hooks/useDataTable';
 import { useToast } from '@/hooks/useToast';
 import Modal from '@/components/ui/Modal';
 
+// Read CSRF token from Blade layout meta tag
+const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
+
 interface User {
   id: number;
   name: string;
@@ -228,7 +231,7 @@ export default function AdminUsersPage() {
                 try {
                   const res = await fetch(`/admin/users/${editing.id}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken },
                     body: JSON.stringify({ name: editName }),
                   });
                   if (!res.ok) {
@@ -298,7 +301,7 @@ export default function AdminUsersPage() {
               onClick={async () => {
                 if (!deleting) return;
                 try {
-                  const res = await fetch(`/admin/users/${deleting.id}`, { method: 'DELETE', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                  const res = await fetch(`/admin/users/${deleting.id}`, { method: 'DELETE', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken } });
                   if (!res.ok && res.status !== 204) throw new Error(`Delete failed (${res.status})`);
                   show({ title: 'Deleted', description: `User #${deleting.id} deleted` });
                   setConfirmOpen(false);

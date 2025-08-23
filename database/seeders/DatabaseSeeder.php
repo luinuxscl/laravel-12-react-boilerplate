@@ -17,6 +17,9 @@ class DatabaseSeeder extends Seeder
         // Seed base roles
         $this->call(RolesSeeder::class);
 
+        // Seed initial settings
+        $this->call(SettingsSeeder::class);
+
         // Create a demo user and assign default role
         $user = User::factory()->create([
             'name' => 'Test User',
