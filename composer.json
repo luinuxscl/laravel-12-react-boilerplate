@@ -69,6 +69,40 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "format:php": [
+            "vendor/bin/pint"
+        ],
+        "lint:php": [
+            "vendor/bin/pint --test"
+        ],
+        "app:clear": [
+            "@php artisan optimize:clear --ansi"
+        ],
+        "app:cache": [
+            "@php artisan config:cache --ansi",
+            "@php artisan route:cache --ansi",
+            "@php artisan view:cache --ansi",
+            "@php artisan event:cache --ansi"
+        ],
+        "deploy:down": [
+            "@php artisan down --render=errors::503 --retry=60 --ansi"
+        ],
+        "deploy:migrate": [
+            "@php artisan migrate --force --ansi"
+        ],
+        "deploy:queue-restart": [
+            "@php artisan queue:restart --ansi"
+        ],
+        "deploy:up": [
+            "@php artisan up --ansi"
+        ],
+        "deploy": [
+            "@deploy:down",
+            "@deploy:migrate",
+            "@app:cache",
+            "@deploy:queue-restart",
+            "@deploy:up"
         ]
     },
     "extra": {

@@ -29,14 +29,14 @@ jobs:
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
           npm install
 
-      - name: Run Pint
-        run: vendor/bin/pint
+      - name: Run Pint (test)
+        run: vendor/bin/pint --test
 
-      - name: Format Frontend
-        run: npm run format
+      - name: Check Prettier
+        run: npm run format:check
 
-      - name: Lint Frontend
-        run: npm run lint
+      - name: Lint Frontend (check)
+        run: npm run lint:check
 
       # - name: Commit Changes
       #   uses: stefanzweifel/git-auto-commit-action@v5

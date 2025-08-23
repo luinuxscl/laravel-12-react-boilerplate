@@ -69,8 +69,18 @@ php artisan test
 # Construir assets
 npm run build
 
-# Linter/formatter (pendiente integrar Pint en FASE 5)
-# vendor/bin/pint
+# Formato/Lint Backend (PHP - Laravel Pint)
+composer run format:php       # aplica formato
+composer run lint:php         # verifica formato (CI)
+
+# Formato/Lint Frontend
+npm run format                # Prettier write
+npm run format:check          # Prettier check (CI)
+npm run lint                  # ESLint fix
+npm run lint:check            # ESLint check (CI)
+
+# Tipos TypeScript
+npm run types
 ```
 
 ## Stack
@@ -85,3 +95,12 @@ npm run build
 - Seguir PSR-12/PSR-4.
 - Nombres en inglés; comentarios explicativos en español cuando aporten valor.
 - Ver mejoras pendientes y roadmap en `docs/`.
+
+### Estándares de código
+
+- PHP: Laravel Pint preset `laravel` con reglas adicionales (`ordered_imports`, sin `phpdoc_align`). Configuración en `pint.json`.
+- JS/TS/React: ESLint 9 + `eslint-config-prettier`, plugins React/Hooks. Prettier con plugins `organize-imports` y `tailwindcss`.
+- CI (`.github/workflows/lint.yml`):
+  - `vendor/bin/pint --test`
+  - `npm run format:check`
+  - `npm run lint:check`

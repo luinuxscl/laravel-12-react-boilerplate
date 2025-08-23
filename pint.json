@@ -1,0 +1,12 @@
+{
+  "preset": "laravel",
+  "rules": {
+    "ordered_imports": true,
+    "phpdoc_align": false
+  },
+  "exclude": [
+    "bootstrap/cache",
+    "storage",
+    "vendor"
+  ]
+}
