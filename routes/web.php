@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\UsersController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -22,6 +23,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('notifications', [NotificationsController::class, 'index'])->name('notifications.index');
     Route::post('notifications/demo', [NotificationsController::class, 'demo'])->name('notifications.demo');
     Route::post('notifications/{id}/read', [NotificationsController::class, 'markAsRead'])->name('notifications.read');
+
+    // DataTable de usuarios (solo Admin)
+    Route::get('admin/users', [UsersController::class, 'index'])
+        ->middleware('role:Admin')
+        ->name('admin.users.index');
 });
 
 require __DIR__.'/settings.php';
