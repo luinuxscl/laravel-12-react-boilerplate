@@ -22,6 +22,9 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            // Campos extra para control de UI (no afectan tests que validan estructura mínima)
+            'roles' => $this->whenLoaded('roles', fn () => $this->getRoleNames()),
+            'is_root' => $this->getRoleNames()->map(fn ($r) => strtolower($r))->contains('root'),
         ];
     }
 }

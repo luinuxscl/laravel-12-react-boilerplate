@@ -26,7 +26,7 @@ class UsersController extends Controller
             'page' => ['nullable', 'integer', 'min:1'],
         ]);
 
-        $query = User::query();
+        $query = User::query()->with('roles');
 
         // Filtro de búsqueda simple por nombre o email
         if ($search = $request->string('search')->toString()) {

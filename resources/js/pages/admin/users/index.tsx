@@ -16,11 +16,13 @@ interface User {
   name: string;
   email: string;
   created_at: string;
+  is_root?: boolean;
 }
 
 export default function AdminUsersPage() {
   const { auth } = usePage().props as any;
   const meId: number | null = auth?.user?.id ?? null;
+  const isRoot: boolean = Boolean(auth?.isRoot);
   const { page, perPage, search, sortBy, sortDir, setPage, setPerPage, setSearch, setSort } = useDataTable({});
   const { show } = useToast();
   const [data, setData] = useState<User[]>([]);
@@ -57,17 +59,19 @@ export default function AdminUsersPage() {
           >
             View
           </button>
-          <button
-            className="rounded-md border px-2 py-1 text-xs"
-            onClick={() => {
-              setEditing(row);
-              setEditName(row.name);
-              setEditOpen(true);
-            }}
-          >
-            Edit
-          </button>
-          {meId !== row.id && (
+          {(!row.is_root || isRoot) && (
+            <button
+              className="rounded-md border px-2 py-1 text-xs"
+              onClick={() => {
+                setEditing(row);
+                setEditName(row.name);
+                setEditOpen(true);
+              }}
+            >
+              Edit
+            </button>
+          )}
+          {meId !== row.id && (!row.is_root || isRoot) && (
             <button
               className="rounded-md border px-2 py-1 text-xs text-red-600"
               onClick={() => {
@@ -81,7 +85,7 @@ export default function AdminUsersPage() {
         </div>
       ),
     },
-  ], [meId]);
+  ], [meId, isRoot]);
 
   useEffect(() => {
     const controller = new AbortController();
