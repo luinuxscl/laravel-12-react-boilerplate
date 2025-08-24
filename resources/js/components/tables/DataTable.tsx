@@ -16,9 +16,11 @@ export type DataTableProps<T> = {
   onPageChange?: (page: number) => void;
   onPerPageChange?: (perPage: number) => void;
   onSearch?: (term: string) => void;
+  loadingComponent?: React.ReactNode;
+  emptyComponent?: React.ReactNode;
 };
 
-export function DataTable<T>({ columns, data, loading }: DataTableProps<T>) {
+export function DataTable<T>({ columns, data, loading, loadingComponent, emptyComponent }: DataTableProps<T>) {
 
   return (
     <div className="w-full overflow-x-auto">
@@ -34,21 +36,27 @@ export function DataTable<T>({ columns, data, loading }: DataTableProps<T>) {
         </thead>
         <tbody>
           {loading && (
-            Array.from({ length: 5 }).map((_, i) => (
-              <tr key={`s-${i}`} className="border-b">
-                {columns.map((c, j) => (
-                  <td key={`${i}-${j}`} className="px-3 py-2">
-                    <div className="h-4 w-full max-w-[140px] animate-pulse rounded bg-muted" />
-                  </td>
-                ))}
+            loadingComponent ? (
+              <tr>
+                <td colSpan={columns.length} className="px-3 py-3">{loadingComponent}</td>
               </tr>
-            ))
+            ) : (
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={`s-${i}`} className="border-b">
+                  {columns.map((c, j) => (
+                    <td key={`${i}-${j}`} className="px-3 py-2">
+                      <div className="h-4 w-full max-w-[140px] animate-pulse rounded bg-muted" />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )
           )}
 
           {!loading && data.length === 0 && (
             <tr>
               <td className="px-3 py-6 text-center text-sm text-muted-foreground" colSpan={columns.length}>
-                No records found
+                {emptyComponent ?? 'No records found'}
               </td>
             </tr>
           )}

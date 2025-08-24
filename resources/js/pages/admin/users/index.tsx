@@ -5,6 +5,8 @@ import { useDataTable } from '@/hooks/useDataTable';
 import { useToast } from '@/hooks/useToast';
 import Modal from '@/components/ui/Modal';
 import AppLayout from '@/layouts/app-layout';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import EmptyState from '@/components/ui/EmptyState';
 
 // Read CSRF token from Blade layout meta tag
 const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
@@ -196,6 +198,8 @@ export default function AdminUsersPage() {
           }))}
           data={data}
           loading={loading}
+          loadingComponent={<LoadingSpinner label="Loading users…" />}
+          emptyComponent={<EmptyState title="No users found" description="Try adjusting filters or search." />}
           total={meta.total}
           page={meta.current_page}
           perPage={meta.per_page}

@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import EmptyState from '@/components/ui/EmptyState';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 type Notification = {
   id: string;
@@ -29,6 +32,7 @@ export default function NotificationsPage() {
   const [perPage] = useState(10);
   const [q, setQ] = useState('');
   const [allOnlyUnread, setAllOnlyUnread] = useState(false);
+  const [confirmAllOpen, setConfirmAllOpen] = useState(false);
   const csrfToken = useMemo(() => (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '', []);
 
   const load = useCallback(async (opts?: { unreadPage?: number; allPage?: number }) => {
@@ -67,6 +71,7 @@ export default function NotificationsPage() {
 
   async function markAll() {
     await fetch('/notifications/read-all', { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken } });
+    setConfirmAllOpen(false);
     load();
   }
 
@@ -100,12 +105,20 @@ export default function NotificationsPage() {
             <div className="bg-muted/40 px-3 py-2 text-sm font-medium flex items-center justify-between">
               <span>Unread ({unread.total})</span>
               {unread.total > 0 && (
-                <button className="rounded-md border px-2 py-1 text-xs" onClick={markAll}>Mark all as read</button>
+                <button className="rounded-md border px-2 py-1 text-xs" onClick={() => setConfirmAllOpen(true)}>Mark all as read</button>
               )}
             </div>
             <ul className="divide-y">
-              {loading && <li className="px-3 py-2 text-sm text-muted-foreground">Loading...</li>}
-              {!loading && unread.data.length === 0 && <li className="px-3 py-2 text-sm text-muted-foreground">No unread notifications.</li>}
+              {loading && (
+                <li className="px-3 py-2 text-sm text-muted-foreground">
+                  <LoadingSpinner label="Loading unread…" />
+                </li>
+              )}
+              {!loading && unread.data.length === 0 && (
+                <li className="px-3 py-2 text-sm text-muted-foreground">
+                  <EmptyState title="No unread notifications" description="You're all caught up." />
+                </li>
+              )}
               {!loading && unread.data.map((n) => (
                 <li key={n.id} className="px-3 py-2 text-sm flex items-start justify-between gap-4">
                   <div>
@@ -148,8 +161,16 @@ export default function NotificationsPage() {
               </div>
             </div>
             <ul className="divide-y">
-              {loading && <li className="px-3 py-2 text-sm text-muted-foreground">Loading...</li>}
-              {!loading && all.data.length === 0 && <li className="px-3 py-2 text-sm text-muted-foreground">No notifications.</li>}
+              {loading && (
+                <li className="px-3 py-2 text-sm text-muted-foreground">
+                  <LoadingSpinner label="Loading all…" />
+                </li>
+              )}
+              {!loading && all.data.length === 0 && (
+                <li className="px-3 py-2 text-sm text-muted-foreground">
+                  <EmptyState title="No notifications" description="There is nothing to show yet." />
+                </li>
+              )}
               {!loading && all.data.map((n) => (
                 <li key={n.id} className="px-3 py-2 text-sm">
                   <div className="flex items-center justify-between gap-4">
@@ -171,6 +192,14 @@ export default function NotificationsPage() {
             </div>
           </div>
         </div>
+        <ConfirmDialog
+          open={confirmAllOpen}
+          onClose={() => setConfirmAllOpen(false)}
+          onConfirm={markAll}
+          title="Mark all as read?"
+          description="This will mark all unread notifications as read."
+          confirmLabel="Mark all"
+        />
       </div>
     </AppLayout>
   );
