@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
@@ -7,6 +7,8 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function AdminRolesPage() {
   type Role = { id: number; name: string };
+  const { auth } = usePage().props as any;
+  const isRoot: boolean = Boolean(auth?.isRoot);
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -16,6 +18,7 @@ export default function AdminRolesPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const csrfToken = useMemo(() => (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '', []);
+  const isRootRole = (name: string) => name?.toLowerCase() === 'root';
 
   useEffect(() => {
     let mounted = true;
@@ -31,6 +34,10 @@ export default function AdminRolesPage() {
   async function createRole(e: React.FormEvent) {
     e.preventDefault();
     if (!newName.trim()) return;
+    if (isRootRole(newName) && !isRoot) {
+      // Bloquear creación de rol root por no-root
+      return;
+    }
     setCreating(true);
     try {
       const res = await fetch('/admin/roles', {
@@ -49,6 +56,11 @@ export default function AdminRolesPage() {
   }
 
   function askDeleteRole(id: number) {
+    const r = roles.find((x) => x.id === id);
+    if (r && isRootRole(r.name) && !isRoot) {
+      // Bloquear eliminación de rol root por no-root
+      return;
+    }
     setDeletingId(id);
     setConfirmOpen(true);
   }
@@ -62,6 +74,9 @@ export default function AdminRolesPage() {
   }
 
   function startEdit(role: Role) {
+    if (isRootRole(role.name) && !isRoot) {
+      return;
+    }
     setEditingId(role.id);
     setEditName(role.name);
   }
@@ -74,6 +89,9 @@ export default function AdminRolesPage() {
   async function saveEdit(id: number) {
     const name = editName.trim();
     if (!name) return;
+    if (isRootRole(name) && !isRoot) {
+      return;
+    }
     const res = await fetch(`/admin/roles/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken },
@@ -102,7 +120,7 @@ export default function AdminRolesPage() {
             placeholder="New role name"
             className="w-full rounded-md border px-3 py-2 text-sm bg-background"
           />
-          <button disabled={creating || !newName.trim()} className="rounded-md border px-3 py-2 text-sm disabled:opacity-50">
+          <button disabled={creating || !newName.trim() || (!isRoot && isRootRole(newName))} className="rounded-md border px-3 py-2 text-sm disabled:opacity-50">
             {creating ? 'Creating…' : 'Create'}
           </button>
         </form>
@@ -148,13 +166,19 @@ export default function AdminRolesPage() {
                   <td className="px-3 py-2 text-right">
                     {editingId === role.id ? (
                       <div className="inline-flex gap-2">
-                        <button onClick={() => saveEdit(role.id)} className="rounded-md border px-2 py-1 text-xs">Save</button>
+                        <button onClick={() => saveEdit(role.id)} className="rounded-md border px-2 py-1 text-xs" disabled={!isRoot && isRootRole(editName)}>
+                          Save
+                        </button>
                         <button onClick={cancelEdit} className="rounded-md border px-2 py-1 text-xs">Cancel</button>
                       </div>
                     ) : (
                       <div className="inline-flex gap-2">
-                        <button onClick={() => startEdit(role)} className="rounded-md border px-2 py-1 text-xs">Edit</button>
-                        <button onClick={() => askDeleteRole(role.id)} className="rounded-md border px-2 py-1 text-xs text-red-600">Delete</button>
+                        <button onClick={() => startEdit(role)} className="rounded-md border px-2 py-1 text-xs" disabled={!isRoot && isRootRole(role.name)}>
+                          Edit
+                        </button>
+                        <button onClick={() => askDeleteRole(role.id)} className="rounded-md border px-2 py-1 text-xs text-red-600" disabled={!isRoot && isRootRole(role.name)}>
+                          Delete
+                        </button>
                       </div>
                     )}
                   </td>

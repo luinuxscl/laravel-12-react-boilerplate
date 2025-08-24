@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import DataTable, { Column } from '@/components/tables/DataTable';
 import { useDataTable } from '@/hooks/useDataTable';
 import { useToast } from '@/hooks/useToast';
@@ -19,6 +19,8 @@ interface User {
 }
 
 export default function AdminUsersPage() {
+  const { auth } = usePage().props as any;
+  const meId: number | null = auth?.user?.id ?? null;
   const { page, perPage, search, sortBy, sortDir, setPage, setPerPage, setSearch, setSort } = useDataTable({});
   const { show } = useToast();
   const [data, setData] = useState<User[]>([]);
@@ -65,19 +67,21 @@ export default function AdminUsersPage() {
           >
             Edit
           </button>
-          <button
-            className="rounded-md border px-2 py-1 text-xs text-red-600"
-            onClick={() => {
-              setDeleting(row);
-              setConfirmOpen(true);
-            }}
-          >
-            Delete
-          </button>
+          {meId !== row.id && (
+            <button
+              className="rounded-md border px-2 py-1 text-xs text-red-600"
+              onClick={() => {
+                setDeleting(row);
+                setConfirmOpen(true);
+              }}
+            >
+              Delete
+            </button>
+          )}
         </div>
       ),
     },
-  ], []);
+  ], [meId]);
 
   useEffect(() => {
     const controller = new AbortController();
