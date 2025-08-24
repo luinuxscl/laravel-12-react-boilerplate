@@ -4,6 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { TOOLTIP } from '@/lib/perm-tooltips';
 
 export default function AdminRolesPage() {
   type Role = { id: number; name: string };
@@ -120,7 +121,11 @@ export default function AdminRolesPage() {
             placeholder="New role name"
             className="w-full rounded-md border px-3 py-2 text-sm bg-background"
           />
-          <button disabled={creating || !newName.trim() || (!isRoot && isRootRole(newName))} className="rounded-md border px-3 py-2 text-sm disabled:opacity-50">
+          <button
+            disabled={creating || !newName.trim() || (!isRoot && isRootRole(newName))}
+            title={!isRoot && isRootRole(newName) ? TOOLTIP.onlyRootManageRootRole : undefined}
+            className="rounded-md border px-3 py-2 text-sm disabled:opacity-50"
+          >
             {creating ? 'Creating…' : 'Create'}
           </button>
         </form>
@@ -166,17 +171,32 @@ export default function AdminRolesPage() {
                   <td className="px-3 py-2 text-right">
                     {editingId === role.id ? (
                       <div className="inline-flex gap-2">
-                        <button onClick={() => saveEdit(role.id)} className="rounded-md border px-2 py-1 text-xs" disabled={!isRoot && isRootRole(editName)}>
+                        <button
+                          onClick={() => saveEdit(role.id)}
+                          className="rounded-md border px-2 py-1 text-xs"
+                          disabled={!isRoot && isRootRole(editName)}
+                          title={!isRoot && isRootRole(editName) ? TOOLTIP.onlyRootManageRootRole : undefined}
+                        >
                           Save
                         </button>
                         <button onClick={cancelEdit} className="rounded-md border px-2 py-1 text-xs">Cancel</button>
                       </div>
                     ) : (
                       <div className="inline-flex gap-2">
-                        <button onClick={() => startEdit(role)} className="rounded-md border px-2 py-1 text-xs" disabled={!isRoot && isRootRole(role.name)}>
+                        <button
+                          onClick={() => startEdit(role)}
+                          className="rounded-md border px-2 py-1 text-xs"
+                          disabled={!isRoot && isRootRole(role.name)}
+                          title={!isRoot && isRootRole(role.name) ? TOOLTIP.onlyRootManageRootRole : undefined}
+                        >
                           Edit
                         </button>
-                        <button onClick={() => askDeleteRole(role.id)} className="rounded-md border px-2 py-1 text-xs text-red-600" disabled={!isRoot && isRootRole(role.name)}>
+                        <button
+                          onClick={() => askDeleteRole(role.id)}
+                          className="rounded-md border px-2 py-1 text-xs text-red-600"
+                          disabled={!isRoot && isRootRole(role.name)}
+                          title={!isRoot && isRootRole(role.name) ? TOOLTIP.onlyRootManageRootRole : undefined}
+                        >
                           Delete
                         </button>
                       </div>

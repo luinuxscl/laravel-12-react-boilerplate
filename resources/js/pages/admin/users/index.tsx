@@ -7,6 +7,7 @@ import Modal from '@/components/ui/Modal';
 import AppLayout from '@/layouts/app-layout';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
+import { TOOLTIP } from '@/lib/perm-tooltips';
 
 // Read CSRF token from Blade layout meta tag
 const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
@@ -61,7 +62,7 @@ export default function AdminUsersPage() {
           </button>
           {(() => {
             const blockedEdit = Boolean(row.is_root) && !isRoot;
-            const titleEdit = blockedEdit ? 'Only root can edit root users' : undefined;
+            const titleEdit = blockedEdit ? TOOLTIP.onlyRootManageRootUser : undefined;
             return (
               <button
                 className="rounded-md border px-2 py-1 text-xs disabled:opacity-50"
@@ -83,9 +84,9 @@ export default function AdminUsersPage() {
             const blockedSelf = meId === row.id;
             const blockedDelete = blockedRoot || blockedSelf;
             const titleDelete = blockedSelf
-              ? 'You cannot delete yourself'
+              ? TOOLTIP.cannotDeleteSelf
               : blockedRoot
-              ? 'Only root can delete root users'
+              ? TOOLTIP.onlyRootManageRootUser
               : undefined;
             return (
               <button
