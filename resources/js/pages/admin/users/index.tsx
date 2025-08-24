@@ -59,29 +59,49 @@ export default function AdminUsersPage() {
           >
             View
           </button>
-          {(!row.is_root || isRoot) && (
-            <button
-              className="rounded-md border px-2 py-1 text-xs"
-              onClick={() => {
-                setEditing(row);
-                setEditName(row.name);
-                setEditOpen(true);
-              }}
-            >
-              Edit
-            </button>
-          )}
-          {meId !== row.id && (!row.is_root || isRoot) && (
-            <button
-              className="rounded-md border px-2 py-1 text-xs text-red-600"
-              onClick={() => {
-                setDeleting(row);
-                setConfirmOpen(true);
-              }}
-            >
-              Delete
-            </button>
-          )}
+          {(() => {
+            const blockedEdit = Boolean(row.is_root) && !isRoot;
+            const titleEdit = blockedEdit ? 'Only root can edit root users' : undefined;
+            return (
+              <button
+                className="rounded-md border px-2 py-1 text-xs disabled:opacity-50"
+                disabled={blockedEdit}
+                title={titleEdit}
+                onClick={() => {
+                  if (blockedEdit) return;
+                  setEditing(row);
+                  setEditName(row.name);
+                  setEditOpen(true);
+                }}
+              >
+                Edit
+              </button>
+            );
+          })()}
+          {(() => {
+            const blockedRoot = Boolean(row.is_root) && !isRoot;
+            const blockedSelf = meId === row.id;
+            const blockedDelete = blockedRoot || blockedSelf;
+            const titleDelete = blockedSelf
+              ? 'You cannot delete yourself'
+              : blockedRoot
+              ? 'Only root can delete root users'
+              : undefined;
+            return (
+              <button
+                className="rounded-md border px-2 py-1 text-xs text-red-600 disabled:opacity-50"
+                disabled={blockedDelete}
+                title={titleDelete}
+                onClick={() => {
+                  if (blockedDelete) return;
+                  setDeleting(row);
+                  setConfirmOpen(true);
+                }}
+              >
+                Delete
+              </button>
+            );
+          })()}
         </div>
       ),
     },

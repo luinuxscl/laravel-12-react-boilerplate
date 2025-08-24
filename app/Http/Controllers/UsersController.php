@@ -85,6 +85,7 @@ class UsersController extends Controller
     public function show(User $user)
     {
         $this->authorize('view', $user);
+        $user->load('roles');
         return response()->json(['data' => UserResource::make($user)]);
     }
 
