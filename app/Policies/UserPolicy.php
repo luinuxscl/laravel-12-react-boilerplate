@@ -11,7 +11,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(['Admin', 'Super Admin']);
+        return $user->hasRole(['admin', 'root']);
     }
 
     /**
@@ -19,7 +19,12 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return $user->id === $model->id || $user->hasRole(['Admin', 'Super Admin']);
+        // Solo un root puede ver perfiles de otros root
+        if ($this->isRoot($model)) {
+            return $user->hasRole('root');
+        }
+
+        return $user->id === $model->id || $user->hasRole(['admin', 'root']);
     }
 
     /**
@@ -27,7 +32,8 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(['Admin', 'Super Admin']);
+        // Crear usuarios (no implica asignar rol root aquí)
+        return $user->hasRole(['admin', 'root']);
     }
 
     /**
@@ -35,7 +41,12 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return $user->hasRole(['Admin', 'Super Admin']);
+        // Solo un root puede actualizar a un usuario root
+        if ($this->isRoot($model)) {
+            return $user->hasRole('root');
+        }
+
+        return $user->hasRole(['admin', 'root']);
     }
 
     /**
@@ -43,6 +54,16 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->hasRole(['Admin', 'Super Admin']);
+        // Solo un root puede eliminar a un usuario root
+        if ($this->isRoot($model)) {
+            return $user->hasRole('root');
+        }
+
+        return $user->hasRole(['admin', 'root']);
+    }
+
+    protected function isRoot(User $user): bool
+    {
+        return $user->hasRole('root');
     }
 }
