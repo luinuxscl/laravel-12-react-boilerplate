@@ -13,6 +13,7 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', User::class);
         // Validación de filtros y parámetros de paginación/orden
         $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
@@ -83,6 +84,7 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
+        $this->authorize('view', $user);
         return response()->json(['data' => UserResource::make($user)]);
     }
 
@@ -91,6 +93,7 @@ class UsersController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        $this->authorize('update', $user);
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
         ]);
@@ -105,6 +108,7 @@ class UsersController extends Controller
      */
     public function destroy(Request $request, User $user)
     {
+        $this->authorize('delete', $user);
         // Evitar auto-eliminación accidental via endpoint admin
         if ($request->user()->id === $user->id) {
             return response()->json(['message' => 'You cannot delete yourself.'], 422);
