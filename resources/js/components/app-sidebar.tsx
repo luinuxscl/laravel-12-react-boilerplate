@@ -32,6 +32,9 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     const page = usePage();
+    const { auth } = page.props as any;
+    const isAdmin: boolean = Boolean(auth?.isAdmin);
+    const isRoot: boolean = Boolean(auth?.isRoot);
     const [unreadCount, setUnreadCount] = React.useState<number>(0);
     const { state: sidebarState, toggleSidebar } = useSidebar();
     const [adminOpen, setAdminOpen] = React.useState<boolean>(page.url.startsWith('/admin/'));
@@ -107,60 +110,64 @@ export function AppSidebar() {
                     </SidebarMenu>
                 </SidebarGroup>
 
-                {/* Admin Group */}
-                <SidebarGroup className="px-2 py-0">
-                    <SidebarGroupLabel>Admin</SidebarGroupLabel>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <Collapsible open={adminOpen} onOpenChange={setAdminOpen}>
-                                <CollapsibleTrigger asChild>
-                                    <SidebarMenuButton
-                                        tooltip={{ children: 'Admin' }}
-                                        onClick={(e) => {
-                                            if (sidebarState === 'collapsed') {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                toggleSidebar();
-                                                setAdminOpen(true);
-                                            }
-                                        }}
-                                    >
-                                        <Cog />
-                                        <span>Admin</span>
-                                    </SidebarMenuButton>
-                                </CollapsibleTrigger>
-                                <CollapsibleContent>
-                                    <SidebarMenuSub>
-                                        <li>
-                                            <SidebarMenuSubButton asChild isActive={page.url.startsWith('/admin/users')}>
-                                                <Link href="/admin/users-ui" prefetch>
-                                                    <Users />
-                                                    <span>Users</span>
-                                                </Link>
-                                            </SidebarMenuSubButton>
-                                        </li>
-                                        <li>
-                                            <SidebarMenuSubButton asChild isActive={page.url.startsWith('/admin/roles')}>
-                                                <Link href="/admin/roles-ui" prefetch>
-                                                    <Shield />
-                                                    <span>Roles</span>
-                                                </Link>
-                                            </SidebarMenuSubButton>
-                                        </li>
-                                        <li>
-                                            <SidebarMenuSubButton asChild isActive={page.url.startsWith('/admin/settings')}>
-                                                <Link href="/admin/settings-ui" prefetch>
-                                                    <Cog />
-                                                    <span>Settings</span>
-                                                </Link>
-                                            </SidebarMenuSubButton>
-                                        </li>
-                                    </SidebarMenuSub>
-                                </CollapsibleContent>
-                            </Collapsible>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                </SidebarGroup>
+                {/* Admin Group (solo visible para Admin o Root) */}
+                {(isAdmin || isRoot) && (
+                    <SidebarGroup className="px-2 py-0">
+                        <SidebarGroupLabel>Admin</SidebarGroupLabel>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <Collapsible open={adminOpen} onOpenChange={setAdminOpen}>
+                                    <CollapsibleTrigger asChild>
+                                        <SidebarMenuButton
+                                            tooltip={{ children: 'Admin' }}
+                                            onClick={(e) => {
+                                                if (sidebarState === 'collapsed') {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    toggleSidebar();
+                                                    setAdminOpen(true);
+                                                }
+                                            }}
+                                        >
+                                            <Cog />
+                                            <span>Admin</span>
+                                        </SidebarMenuButton>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                        <SidebarMenuSub>
+                                            <li>
+                                                <SidebarMenuSubButton asChild isActive={page.url.startsWith('/admin/users')}>
+                                                    <Link href="/admin/users-ui" prefetch>
+                                                        <Users />
+                                                        <span>Users</span>
+                                                    </Link>
+                                                </SidebarMenuSubButton>
+                                            </li>
+                                            {isRoot && (
+                                                <li>
+                                                    <SidebarMenuSubButton asChild isActive={page.url.startsWith('/admin/roles')}>
+                                                        <Link href="/admin/roles-ui" prefetch>
+                                                            <Shield />
+                                                            <span>Roles</span>
+                                                        </Link>
+                                                    </SidebarMenuSubButton>
+                                                </li>
+                                            )}
+                                            <li>
+                                                <SidebarMenuSubButton asChild isActive={page.url.startsWith('/admin/settings')}>
+                                                    <Link href="/admin/settings-ui" prefetch>
+                                                        <Cog />
+                                                        <span>Settings</span>
+                                                    </Link>
+                                                </SidebarMenuSubButton>
+                                            </li>
+                                        </SidebarMenuSub>
+                                    </CollapsibleContent>
+                                </Collapsible>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroup>
+                )}
             </SidebarContent>
 
             <SidebarFooter>
