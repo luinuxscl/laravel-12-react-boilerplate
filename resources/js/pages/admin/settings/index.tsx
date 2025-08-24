@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { useToast } from '@/hooks/useToast';
 import AppLayout from '@/layouts/app-layout';
@@ -6,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 // Read CSRF token from Blade layout meta tag
 const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
 
-type SettingsMap = Record<string, any>;
+type SettingsMap = Record<string, unknown>;
 
 export default function AdminSettingsPage() {
   const { show } = useToast();
@@ -16,23 +16,24 @@ export default function AdminSettingsPage() {
   const [valueInput, setValueInput] = useState<string>('{}');
   const [jsonError, setJsonError] = useState<string>('');
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch('/admin/settings');
       if (!res.ok) throw new Error(`Load failed (${res.status})`);
       const json = await res.json();
       setSettings(json.data || {});
-    } catch (e: any) {
-      show({ title: 'Error', description: e.message || 'Failed to load settings' });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Failed to load settings';
+      show({ title: 'Error', description: msg });
     } finally {
       setLoading(false);
     }
-  }
+  }, [show]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
-  function pretty(v: any) {
+  function pretty(v: unknown) {
     try {
       return JSON.stringify(v, null, 2);
     } catch {
@@ -44,7 +45,7 @@ export default function AdminSettingsPage() {
     // allow raw string as fallback if not valid JSON
     try {
       return JSON.parse(input);
-    } catch (e: any) {
+    } catch {
       return undefined;
     }
   }
@@ -71,8 +72,9 @@ export default function AdminSettingsPage() {
       setKeyInput('');
       setValueInput('{}');
       await load();
-    } catch (e: any) {
-      show({ title: 'Error', description: e.message || 'Failed to save' });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Failed to save';
+      show({ title: 'Error', description: msg });
     }
   }
 
@@ -85,8 +87,9 @@ export default function AdminSettingsPage() {
       if (!res.ok && res.status !== 204) throw new Error(`Delete failed (${res.status})`);
       show({ title: 'Deleted', description: `Setting "${key}" deleted` });
       await load();
-    } catch (e: any) {
-      show({ title: 'Error', description: e.message || 'Failed to delete' });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Failed to delete';
+      show({ title: 'Error', description: msg });
     }
   }
 

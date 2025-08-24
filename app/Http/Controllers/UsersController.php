@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -63,8 +64,11 @@ class UsersController extends Controller
         $perPage = $perPage > 0 && $perPage <= 100 ? $perPage : 10;
         $paginator = $query->paginate($perPage);
 
+        // Wrap items with Resource and keep meta intact
+        $items = UserResource::collection(collect($paginator->items()));
+
         return response()->json([
-            'data' => $paginator->items(),
+            'data' => $items,
             'meta' => [
                 'total' => $paginator->total(),
                 'per_page' => $paginator->perPage(),
@@ -79,7 +83,7 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
-        return response()->json(['data' => $user]);
+        return response()->json(['data' => UserResource::make($user)]);
     }
 
     /**
@@ -93,7 +97,7 @@ class UsersController extends Controller
 
         $user->update($data);
 
-        return response()->json(['data' => $user->fresh()]);
+        return response()->json(['data' => UserResource::make($user->fresh())]);
     }
 
     /**

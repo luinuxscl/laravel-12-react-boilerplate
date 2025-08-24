@@ -20,6 +20,25 @@ it('notificación se almacena correctamente', function () {
     expect($user->unreadNotifications()->count())->toBe(1);
 });
 
+it('marca todas las notificaciones como leídas', function () {
+    $user = User::factory()->create([
+        'email_verified_at' => now(),
+    ]);
+
+    // Crea varias notificaciones
+    $this->actingAs($user)->post('/notifications/demo')->assertOk();
+    $this->actingAs($user)->post('/notifications/demo')->assertOk();
+
+    expect($user->fresh()->unreadNotifications()->count())->toBe(2);
+
+    // Marca todas como leídas
+    $this->actingAs($user)
+        ->post('/notifications/read-all')
+        ->assertOk();
+
+    expect($user->fresh()->unreadNotifications()->count())->toBe(0);
+});
+
 it('configuración se guarda en cache', function () {
     // write
     Settings::set('app.name', ['value' => 'DemoApp']);

@@ -40,12 +40,13 @@ export function AppSidebar() {
             const res = await fetch('/notifications', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             if (!res.ok) return;
             const json = await res.json();
-            setUnreadCount(Array.isArray(json.unread) ? json.unread.length : 0);
-        } catch {}
+            setUnreadCount(Number(json?.unread?.total ?? 0));
+        } catch {
+            /* noop */
+        }
     }, []);
 
     React.useEffect(() => {
-        let mounted = true;
         // initial load
         loadUnread();
         // poll
@@ -57,7 +58,6 @@ export function AppSidebar() {
         const onUpdated = () => loadUnread();
         window.addEventListener('notifications:updated', onUpdated as EventListener);
         return () => {
-            mounted = false;
             clearInterval(id);
             window.removeEventListener('focus', onFocus);
             window.removeEventListener('notifications:updated', onUpdated as EventListener);

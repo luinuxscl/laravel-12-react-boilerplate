@@ -2,7 +2,7 @@ import React from 'react';
 
 export type Column<T> = {
   key: keyof T | string;
-  header: string;
+  header: React.ReactNode;
   render?: (row: T) => React.ReactNode;
 };
 
@@ -53,11 +53,15 @@ export function DataTable<T>({ columns, data, loading }: DataTableProps<T>) {
             </tr>
           )}
 
-          {!loading && data.map((row: any, i) => (
+          {!loading && data.map((row, i) => (
             <tr key={i} className="border-b hover:bg-muted/30">
               {columns.map((c) => (
                 <td key={String(c.key)} className="px-3 py-2">
-                  {c.render ? c.render(row) : String(row[c.key as keyof typeof row] ?? '')}
+                  {c.render ? c.render(row) : (() => {
+                    const key = c.key as keyof typeof row;
+                    const value = (row as typeof row)[key];
+                    return String(value ?? '');
+                  })()}
                 </td>
               ))}
             </tr>

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\RolesController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
@@ -25,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('notifications', [NotificationsController::class, 'index'])->name('notifications.index');
     Route::post('notifications/demo', [NotificationsController::class, 'demo'])->name('notifications.demo');
     Route::post('notifications/{id}/read', [NotificationsController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('notifications/read-all', [NotificationsController::class, 'markAllAsRead'])->name('notifications.read_all');
 
     // Página UI para Notificaciones
     Route::get('notifications-ui', function () {
@@ -36,12 +38,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:Admin')
         ->name('admin.users.index');
 
-    // Listado de roles (solo Admin)
-    Route::get('admin/roles', function () {
-        return response()->json([
-            'data' => Role::query()->orderBy('name')->pluck('name'),
-        ]);
-    })->middleware('role:Admin')->name('admin.roles.index');
+    // Roles CRUD (solo Admin)
+    Route::middleware('role:Admin')->group(function () {
+        Route::get('admin/roles', [RolesController::class, 'index'])->name('admin.roles.index.json');
+        Route::post('admin/roles', [RolesController::class, 'store'])->name('admin.roles.store');
+        Route::put('admin/roles/{role}', [RolesController::class, 'update'])->name('admin.roles.update');
+        Route::delete('admin/roles/{role}', [RolesController::class, 'destroy'])->name('admin.roles.destroy');
+    });
 
     // Detalle y actualización de usuario (solo Admin)
     Route::get('admin/users/{user}', [UsersController::class, 'show'])

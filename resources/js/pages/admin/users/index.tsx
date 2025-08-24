@@ -17,7 +17,7 @@ interface User {
 }
 
 export default function AdminUsersPage() {
-  const { page, perPage, search, sortBy, sortDir, setPage, setPerPage, setSearch, setSort, query } = useDataTable({});
+  const { page, perPage, search, sortBy, sortDir, setPage, setPerPage, setSearch, setSort } = useDataTable({});
   const { show } = useToast();
   const [data, setData] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
@@ -97,9 +97,11 @@ export default function AdminUsersPage() {
         const json = await res.json();
         setData(json.data as User[]);
         setMeta(json.meta);
-      } catch (e: any) {
-        if (e.name !== 'AbortError') {
-          show({ title: 'Error', description: e.message ?? 'Failed to load users' });
+      } catch (e: unknown) {
+        const isAbort = e instanceof DOMException && e.name === 'AbortError';
+        if (!isAbort) {
+          const msg = e instanceof Error ? e.message : 'Failed to load users';
+          show({ title: 'Error', description: msg });
         }
       } finally {
         setLoading(false);
@@ -107,7 +109,7 @@ export default function AdminUsersPage() {
     }
     fetchData();
     return () => controller.abort();
-  }, [page, perPage, search, sortBy, sortDir, role, createdFrom, createdTo]);
+  }, [page, perPage, search, sortBy, sortDir, role, createdFrom, createdTo, show]);
 
   useEffect(() => {
     let mounted = true;
@@ -190,7 +192,7 @@ export default function AdminUsersPage() {
                   <span className="text-[10px]">{sortDir === 'asc' ? '▲' : '▼'}</span>
                 )}
               </button>
-            ) as any,
+            ),
           }))}
           data={data}
           loading={loading}
@@ -252,8 +254,9 @@ export default function AdminUsersPage() {
                   const json = await refetch.json();
                   setData(json.data as User[]);
                   setMeta(json.meta);
-                } catch (e: any) {
-                  show({ title: 'Error', description: e.message ?? 'Failed to update user' });
+                } catch (e: unknown) {
+                  const msg = e instanceof Error ? e.message : 'Failed to update user';
+                  show({ title: 'Error', description: msg });
                 }
               }}
             >
@@ -313,8 +316,9 @@ export default function AdminUsersPage() {
                   const json = await refetch.json();
                   setData(json.data as User[]);
                   setMeta(json.meta);
-                } catch (e: any) {
-                  show({ title: 'Error', description: e.message ?? 'Failed to delete user' });
+                } catch (e: unknown) {
+                  const msg = e instanceof Error ? e.message : 'Failed to delete user';
+                  show({ title: 'Error', description: msg });
                 }
               }}
             >

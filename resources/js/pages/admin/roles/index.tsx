@@ -1,21 +1,78 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 
 export default function AdminRolesPage() {
-  const [roles, setRoles] = useState<string[]>([]);
+  type Role = { id: number; name: string };
+  const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editName, setEditName] = useState('');
+  const csrfToken = useMemo(() => (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '', []);
 
   useEffect(() => {
     let mounted = true;
     setLoading(true);
     fetch('/admin/roles')
       .then((r) => r.json())
-      .then((j) => { if (mounted) setRoles(j.data || []); })
+      .then((j) => { if (mounted) setRoles(Array.isArray(j.data) ? j.data : []); })
       .catch(() => {})
       .finally(() => setLoading(false));
     return () => { mounted = false; };
   }, []);
+
+  async function createRole(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newName.trim()) return;
+    setCreating(true);
+    try {
+      const res = await fetch('/admin/roles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken },
+        body: JSON.stringify({ name: newName.trim() }),
+      });
+      if (res.ok) {
+        const j = await res.json();
+        setRoles((prev) => [...prev, j.data]);
+        setNewName('');
+      }
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  async function deleteRole(id: number) {
+    if (!confirm('Delete this role?')) return;
+    await fetch(`/admin/roles/${id}`, { method: 'DELETE', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken } });
+    setRoles((prev) => prev.filter((r) => r.id !== id));
+  }
+
+  function startEdit(role: Role) {
+    setEditingId(role.id);
+    setEditName(role.name);
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditName('');
+  }
+
+  async function saveEdit(id: number) {
+    const name = editName.trim();
+    if (!name) return;
+    const res = await fetch(`/admin/roles/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken },
+      body: JSON.stringify({ name }),
+    });
+    if (res.ok) {
+      const j = await res.json();
+      setRoles((prev) => prev.map((r) => (r.id === id ? j.data : r)));
+      cancelEdit();
+    }
+  }
 
   return (
     <AppLayout>
@@ -26,29 +83,65 @@ export default function AdminRolesPage() {
           <Link href={route('dashboard')} className="text-sm underline">Back to Dashboard</Link>
         </div>
 
+        <form onSubmit={createRole} className="rounded-md border p-3 flex items-center gap-2">
+          <input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="New role name"
+            className="w-full rounded-md border px-3 py-2 text-sm bg-background"
+          />
+          <button disabled={creating || !newName.trim()} className="rounded-md border px-3 py-2 text-sm disabled:opacity-50">
+            {creating ? 'Creating…' : 'Create'}
+          </button>
+        </form>
+
         <div className="rounded-md border overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead className="bg-muted/40">
               <tr>
-                <th className="px-3 py-2">#</th>
+                <th className="px-3 py-2">ID</th>
                 <th className="px-3 py-2">Name</th>
+                <th className="px-3 py-2 w-32 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading && (
                 <tr>
-                  <td className="px-3 py-2 text-muted-foreground" colSpan={2}>Loading...</td>
+                  <td className="px-3 py-2 text-muted-foreground" colSpan={3}>Loading...</td>
                 </tr>
               )}
               {!loading && roles.length === 0 && (
                 <tr>
-                  <td className="px-3 py-2 text-muted-foreground" colSpan={2}>No roles found.</td>
+                  <td className="px-3 py-2 text-muted-foreground" colSpan={3}>No roles found.</td>
                 </tr>
               )}
-              {!loading && roles.map((name, idx) => (
-                <tr key={name} className="border-t">
-                  <td className="px-3 py-2 w-16">{idx + 1}</td>
-                  <td className="px-3 py-2">{name}</td>
+              {!loading && roles.map((role) => (
+                <tr key={role.id} className="border-t">
+                  <td className="px-3 py-2 w-16">{role.id}</td>
+                  <td className="px-3 py-2">
+                    {editingId === role.id ? (
+                      <input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="w-full rounded-md border px-2 py-1 text-sm bg-background"
+                      />
+                    ) : (
+                      role.name
+                    )}
+                  </td>
+                  <td className="px-3 py-2 text-right">
+                    {editingId === role.id ? (
+                      <div className="inline-flex gap-2">
+                        <button onClick={() => saveEdit(role.id)} className="rounded-md border px-2 py-1 text-xs">Save</button>
+                        <button onClick={cancelEdit} className="rounded-md border px-2 py-1 text-xs">Cancel</button>
+                      </div>
+                    ) : (
+                      <div className="inline-flex gap-2">
+                        <button onClick={() => startEdit(role)} className="rounded-md border px-2 py-1 text-xs">Edit</button>
+                        <button onClick={() => deleteRole(role.id)} className="rounded-md border px-2 py-1 text-xs">Delete</button>
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
