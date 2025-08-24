@@ -16,7 +16,7 @@ class RolesController extends Controller
      */
     public function index(): JsonResponse
     {
-        Gate::authorize('manage-roles', [auth()->user(), null, []]);
+        Gate::authorize('manage-roles');
         $roles = Role::query()->orderBy('name')->get();
 
         return response()->json([
@@ -34,7 +34,7 @@ class RolesController extends Controller
         if ($name === 'root') {
             Gate::authorize('assign-root');
         } else {
-            Gate::authorize('manage-roles', [auth()->user(), null, [$name]]);
+            Gate::authorize('manage-roles', [null, [$name]]);
         }
 
         $role = Role::findOrCreate($name, 'web');
@@ -53,7 +53,7 @@ class RolesController extends Controller
         if ($role->name === 'root') {
             Gate::authorize('assign-root');
         } else {
-            Gate::authorize('manage-roles', [auth()->user(), null, [$role->name]]);
+            Gate::authorize('manage-roles', [null, [$role->name]]);
         }
 
         $role->delete();
@@ -72,7 +72,7 @@ class RolesController extends Controller
         if ($role->name === 'root' || $newName === 'root') {
             Gate::authorize('assign-root');
         } else {
-            Gate::authorize('manage-roles', [auth()->user(), null, [$newName]]);
+            Gate::authorize('manage-roles', [null, [$newName]]);
         }
 
         $role->name = $newName;

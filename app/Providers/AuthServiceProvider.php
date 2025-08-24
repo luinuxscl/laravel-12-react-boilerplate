@@ -27,27 +27,32 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         // Gate: gestión general de roles (excluye rol 'root' salvo que el actor sea root)
-        Gate::define('manage-roles', function (User $actor, ?User $target = null, array $roles = []) {
-            // admin o root pueden gestionar roles en general
-            if (! $actor->hasRole(['admin', 'root'])) {
+        Gate::define('manage-roles', function (User $actor, ?User $target = null, ?array $roles = null) {
+            $actorRoles = collect($actor->getRoleNames())->map(fn ($r) => strtolower($r));
+            $isAdminOrRoot = $actorRoles->intersect(['admin', 'root'])->isNotEmpty();
+            if (! $isAdminOrRoot) {
                 return false;
             }
 
-            // Si se intenta asignar 'root', solo permitido para actor root
+            $roles = $roles ? array_map('strtolower', $roles) : [];
             $assigningRoot = in_array('root', $roles, true);
-            if ($assigningRoot && ! $actor->hasRole('root')) {
+            if ($assigningRoot && ! $actorRoles->contains('root')) {
                 return false;
             }
 
-            // Evitar que alguien que no sea root modifique a un usuario root
-            if ($target && $target->hasRole('root') && ! $actor->hasRole('root')) {
-                return false;
+            if ($target) {
+                $targetIsRoot = collect($target->getRoleNames())->map(fn ($r) => strtolower($r))->contains('root');
+                if ($targetIsRoot && ! $actorRoles->contains('root')) {
+                    return false;
+                }
             }
 
             return true;
         });
 
-        // Gate explícito para asignar el rol root
-        Gate::define('assign-root', fn (User $actor) => $actor->hasRole('root'));
+        // Gate explícito para asignar el rol root (case-insensitive)
+        Gate::define('assign-root', function (User $actor) {
+            return collect($actor->getRoleNames())->map(fn ($r) => strtolower($r))->contains('root');
+        });
     }
 }

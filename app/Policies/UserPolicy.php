@@ -11,7 +11,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(['admin', 'root']);
+        return $this->hasAnyRoleInsensitive($user, ['admin', 'root']);
     }
 
     /**
@@ -21,10 +21,10 @@ class UserPolicy
     {
         // Solo un root puede ver perfiles de otros root
         if ($this->isRoot($model)) {
-            return $user->hasRole('root');
+            return $this->hasRoleInsensitive($user, 'root');
         }
 
-        return $user->id === $model->id || $user->hasRole(['admin', 'root']);
+        return $user->id === $model->id || $this->hasAnyRoleInsensitive($user, ['admin', 'root']);
     }
 
     /**
@@ -43,10 +43,10 @@ class UserPolicy
     {
         // Solo un root puede actualizar a un usuario root
         if ($this->isRoot($model)) {
-            return $user->hasRole('root');
+            return $this->hasRoleInsensitive($user, 'root');
         }
 
-        return $user->hasRole(['admin', 'root']);
+        return $this->hasAnyRoleInsensitive($user, ['admin', 'root']);
     }
 
     /**
@@ -56,14 +56,27 @@ class UserPolicy
     {
         // Solo un root puede eliminar a un usuario root
         if ($this->isRoot($model)) {
-            return $user->hasRole('root');
+            return $this->hasRoleInsensitive($user, 'root');
         }
 
-        return $user->hasRole(['admin', 'root']);
+        return $this->hasAnyRoleInsensitive($user, ['admin', 'root']);
     }
 
     protected function isRoot(User $user): bool
     {
-        return $user->hasRole('root');
+        return $this->hasRoleInsensitive($user, 'root');
+    }
+
+    protected function hasRoleInsensitive(User $user, string $role): bool
+    {
+        $role = strtolower($role);
+        return collect($user->getRoleNames())->map(fn ($r) => strtolower($r))->contains($role);
+    }
+
+    protected function hasAnyRoleInsensitive(User $user, array $roles): bool
+    {
+        $roles = array_map('strtolower', $roles);
+        $userRoles = collect($user->getRoleNames())->map(fn ($r) => strtolower($r));
+        return $userRoles->intersect($roles)->isNotEmpty();
     }
 }
