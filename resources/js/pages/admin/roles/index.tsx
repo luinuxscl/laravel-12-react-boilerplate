@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import EmptyState from '@/components/ui/EmptyState';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function AdminRolesPage() {
   type Role = { id: number; name: string };
@@ -10,6 +13,8 @@ export default function AdminRolesPage() {
   const [newName, setNewName] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const csrfToken = useMemo(() => (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '', []);
 
   useEffect(() => {
@@ -43,10 +48,17 @@ export default function AdminRolesPage() {
     }
   }
 
-  async function deleteRole(id: number) {
-    if (!confirm('Delete this role?')) return;
-    await fetch(`/admin/roles/${id}`, { method: 'DELETE', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken } });
-    setRoles((prev) => prev.filter((r) => r.id !== id));
+  function askDeleteRole(id: number) {
+    setDeletingId(id);
+    setConfirmOpen(true);
+  }
+
+  async function deleteRoleConfirmed() {
+    if (deletingId == null) return;
+    await fetch(`/admin/roles/${deletingId}`, { method: 'DELETE', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken } });
+    setRoles((prev) => prev.filter((r) => r.id !== deletingId));
+    setConfirmOpen(false);
+    setDeletingId(null);
   }
 
   function startEdit(role: Role) {
@@ -107,12 +119,16 @@ export default function AdminRolesPage() {
             <tbody>
               {loading && (
                 <tr>
-                  <td className="px-3 py-2 text-muted-foreground" colSpan={3}>Loading...</td>
+                  <td className="px-3 py-2 text-muted-foreground" colSpan={3}>
+                    <LoadingSpinner label="Loading roles…" />
+                  </td>
                 </tr>
               )}
               {!loading && roles.length === 0 && (
                 <tr>
-                  <td className="px-3 py-2 text-muted-foreground" colSpan={3}>No roles found.</td>
+                  <td className="px-3 py-2 text-muted-foreground" colSpan={3}>
+                    <EmptyState title="No roles found" description="Create a new role to get started." />
+                  </td>
                 </tr>
               )}
               {!loading && roles.map((role) => (
@@ -138,7 +154,7 @@ export default function AdminRolesPage() {
                     ) : (
                       <div className="inline-flex gap-2">
                         <button onClick={() => startEdit(role)} className="rounded-md border px-2 py-1 text-xs">Edit</button>
-                        <button onClick={() => deleteRole(role.id)} className="rounded-md border px-2 py-1 text-xs">Delete</button>
+                        <button onClick={() => askDeleteRole(role.id)} className="rounded-md border px-2 py-1 text-xs text-red-600">Delete</button>
                       </div>
                     )}
                   </td>
@@ -147,6 +163,14 @@ export default function AdminRolesPage() {
             </tbody>
           </table>
         </div>
+        <ConfirmDialog
+          open={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          onConfirm={deleteRoleConfirmed}
+          title="Delete role?"
+          description="This action cannot be undone. Users with this role will lose the assignment."
+          confirmLabel="Delete"
+        />
       </div>
     </AppLayout>
   );
