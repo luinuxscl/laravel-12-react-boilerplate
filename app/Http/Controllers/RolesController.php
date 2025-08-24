@@ -31,7 +31,7 @@ class RolesController extends Controller
     {
         $name = $request->validated('name');
         // Autorizar gestión de roles y protección especial para 'root'
-        if ($name === 'root') {
+        if (strtolower($name) === 'root') {
             Gate::authorize('assign-root');
         } else {
             Gate::authorize('manage-roles', [null, [$name]]);
@@ -50,7 +50,7 @@ class RolesController extends Controller
     public function destroy(Role $role): JsonResponse
     {
         // Proteger rol 'root': solo root puede eliminarlo
-        if ($role->name === 'root') {
+        if (strtolower($role->name) === 'root') {
             Gate::authorize('assign-root');
         } else {
             Gate::authorize('manage-roles', [null, [$role->name]]);
@@ -69,7 +69,7 @@ class RolesController extends Controller
         $newName = $request->validated('name');
 
         // Si el rol objetivo es 'root' o se intenta renombrar a 'root', solo root autorizado
-        if ($role->name === 'root' || $newName === 'root') {
+        if (strtolower($role->name) === 'root' || strtolower($newName) === 'root') {
             Gate::authorize('assign-root');
         } else {
             Gate::authorize('manage-roles', [null, [$newName]]);

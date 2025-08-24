@@ -3,6 +3,7 @@
 use App\Models\User;
 use Database\Seeders\RolesSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
@@ -24,6 +25,7 @@ it('filtra usuarios por rol y rango de fechas', function () {
     $admin->assignRole('Admin');
 
     // Crear usuarios con distintos roles
+    Role::findOrCreate('Editor', 'web');
     $u1 = User::factory()->create(['created_at' => now()->subDays(10)]); // sin rol
     $u2 = User::factory()->create(['created_at' => now()->subDays(5)]);  // Editor
     $u2->assignRole('Editor');
