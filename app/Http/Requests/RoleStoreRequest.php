@@ -9,7 +9,7 @@ class RoleStoreRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Rely on middleware (auth + role:Admin)
+        // Rely on middleware (auth + role:admin)
         return true;
     }
 
