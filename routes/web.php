@@ -6,6 +6,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Admin\BrandingController;
 use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
@@ -73,6 +74,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('admin/settings/{key}', [AdminSettingsController::class, 'destroy'])
             ->middleware('permission:settings.manage')
             ->name('admin.settings.destroy');
+
+        // Branding uploads
+        Route::post('admin/branding/logo', [BrandingController::class, 'uploadLogo'])
+            ->middleware('permission:settings.manage')
+            ->name('admin.branding.logo');
+        Route::post('admin/branding/favicon', [BrandingController::class, 'uploadFavicon'])
+            ->middleware('permission:settings.manage')
+            ->name('admin.branding.favicon');
 
         // Páginas UI (requieren acceso a admin; sin permisos finos)
         Route::get('admin/users-ui', function () {

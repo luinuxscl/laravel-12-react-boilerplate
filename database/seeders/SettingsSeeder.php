@@ -18,6 +18,12 @@ class SettingsSeeder extends Seeder
             'theme' => 'system', // system | light | dark
         ]);
 
+        // Branding (por defecto sin assets)
+        Settings::set('site.brand', [
+            'logo_url' => null,
+            'favicon_url' => null,
+        ]);
+
         // Notificaciones
         Settings::set('notifications.enabled', true);
 
