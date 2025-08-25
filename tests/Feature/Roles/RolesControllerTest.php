@@ -1,15 +1,25 @@
 <?php
 
 use App\Models\User;
+use Spatie\Permission\PermissionRegistrar;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
 function makeAdminUser(): User {
+    // Reset cache de permisos para el entorno de test
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
+
     $user = User::factory()->create();
-    Role::findOrCreate('admin');
-    $user->assignRole('admin');
+    $admin = Role::findOrCreate('admin');
+
+    // Asegurar permisos mínimos para endpoints de Roles
+    \Spatie\Permission\Models\Permission::findOrCreate('roles.view');
+    \Spatie\Permission\Models\Permission::findOrCreate('roles.manage');
+    $admin->givePermissionTo(['roles.view', 'roles.manage']);
+
+    $user->assignRole($admin);
     return $user;
 }
 
