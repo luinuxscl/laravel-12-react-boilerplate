@@ -34,7 +34,26 @@
         <title inertia>{{ $siteName ?? config('app.name', 'Laravel') }}</title>
 
         @if (!empty($faviconUrl))
-            <link rel="icon" href="{{ $faviconUrl }}">
+            @php
+                $fav = $faviconUrl;
+                $favPath = parse_url($fav, PHP_URL_PATH) ?? $fav;
+                // Normalizar a origen actual si es /storage/* (evita mismatch de puerto en dev)
+                if (str_starts_with($favPath, '/storage/')) {
+                    $fav = request()->getSchemeAndHttpHost() . $favPath;
+                }
+                $ext = strtolower(pathinfo($favPath, PATHINFO_EXTENSION));
+                $sep = str_contains($fav, '?') ? '&' : '?';
+                // cache-busting para forzar actualización del favicon en la pestaña
+                $favVer = $fav . $sep . 'v=' . time();
+            @endphp
+            @if ($ext === 'ico')
+                <link rel="icon" href="{{ $favVer }}" sizes="any" type="image/x-icon">
+                <link rel="shortcut icon" href="{{ $favVer }}" type="image/x-icon">
+            @elseif ($ext === 'svg')
+                <link rel="icon" href="{{ $favVer }}" type="image/svg+xml">
+            @else
+                <link rel="icon" href="{{ $favVer }}" type="image/png">
+            @endif
         @else
             <link rel="icon" href="/favicon.ico" sizes="any">
             <link rel="icon" href="/favicon.svg" type="image/svg+xml">
