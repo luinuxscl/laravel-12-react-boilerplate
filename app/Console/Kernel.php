@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\BoilerplateInstall::class,
+        \App\Console\Commands\ProvisionInitialUser::class,
     ];
 
     /**

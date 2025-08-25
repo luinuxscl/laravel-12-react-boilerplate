@@ -44,6 +44,7 @@ Este documento resume las reglas de autorización, endpoints y pautas de UI impl
 
 ## Frontend (Inertia + React)
 - `app/Http/Middleware/HandleInertiaRequests.php`: comparte `auth.roles`, `auth.isAdmin`, `auth.isRoot`.
+- `resources/js/lib/auth.ts`: helper `makeAuthHelpers()` que deriva capacidades de UI (`canManageUsers`, `canManageRoles`, `canManageSettings`, etc.). La UI lo usa para mostrar/ocultar o deshabilitar acciones, pero siempre se valida en backend.
 - `resources/js/components/app-sidebar.tsx`:
   - Grupo “Admin”: visible solo si `isAdmin || isRoot`.
   - Enlace “Roles”: visible solo si `isRoot`.
@@ -80,6 +81,38 @@ Este documento resume las reglas de autorización, endpoints y pautas de UI impl
   - `GET /admin/users/{user}`
   - `PUT /admin/users/{user}`
   - `DELETE /admin/users/{user}`
+
+## Provisión de usuario inicial (ops)
+- Comando Artisan para crear/actualizar un usuario inicial con rol `admin` o `root` de forma idempotente:
+  - Archivo: `app/Console/Commands/ProvisionInitialUser.php`
+  - Firma: `php artisan user:provision --email=... --name=... --password=... --role=admin|root [--verified] [--yes]`
+  - En producción solicita confirmación, a menos que se use `--yes`.
+
+Ejemplos:
+
+```bash
+# Admin inicial
+php artisan user:provision \
+  --email=admin@example.com \
+  --name="Initial Admin" \
+  --password='SuperSecret123' \
+  --role=admin \
+  --verified \
+  --yes
+
+# Root inicial (precaución: acceso total)
+php artisan user:provision \
+  --email=root@example.com \
+  --name="Root" \
+  --password='AnotherSecret!' \
+  --role=root \
+  --verified \
+  --yes
+```
+
+Notas:
+- El comando asegura la existencia de roles/permisos base ejecutando `RolesSeeder` si es necesario.
+- No imprime la contraseña tras crear; guárdala de forma segura.
 
 ## Próximos pasos sugeridos
 - Revisar otras áreas (Settings, Notifications) para aplicar el mismo patrón de autorización y UI.
