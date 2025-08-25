@@ -28,6 +28,12 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    app?: {
+        name: string;
+        appearance: { theme: 'system' | 'light' | 'dark' };
+        brand: { logo_url: string | null; favicon_url: string | null };
+        [key: string]: unknown;
+    };
     [key: string]: unknown;
 }
 

@@ -94,6 +94,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('admin/settings-ui', [AdminSettingsController::class, 'page'])
             ->name('admin.settings.ui');
+
+        Route::get('admin/branding-ui', function () {
+            return Inertia::render('admin/settings/branding');
+        })->name('admin.branding.ui');
     });
 
     
