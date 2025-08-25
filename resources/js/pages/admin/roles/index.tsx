@@ -5,11 +5,13 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { TOOLTIP } from '@/lib/perm-tooltips';
+import { makeAuthHelpers } from '@/lib/auth';
 
 export default function AdminRolesPage() {
   type Role = { id: number; name: string };
   const { auth } = usePage().props as any;
   const isRoot: boolean = Boolean(auth?.isRoot);
+  const { canManageRoles } = makeAuthHelpers({ roles: auth?.roles || [], isAdmin: !!auth?.isAdmin, isRoot: !!auth?.isRoot });
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -34,6 +36,7 @@ export default function AdminRolesPage() {
 
   async function createRole(e: React.FormEvent) {
     e.preventDefault();
+    if (!canManageRoles()) return;
     if (!newName.trim()) return;
     if (isRootRole(newName) && !isRoot) {
       // Bloquear creación de rol root por no-root
@@ -57,6 +60,7 @@ export default function AdminRolesPage() {
   }
 
   function askDeleteRole(id: number) {
+    if (!canManageRoles()) return;
     const r = roles.find((x) => x.id === id);
     if (r && isRootRole(r.name) && !isRoot) {
       // Bloquear eliminación de rol root por no-root
@@ -75,6 +79,7 @@ export default function AdminRolesPage() {
   }
 
   function startEdit(role: Role) {
+    if (!canManageRoles()) return;
     if (isRootRole(role.name) && !isRoot) {
       return;
     }
@@ -88,6 +93,7 @@ export default function AdminRolesPage() {
   }
 
   async function saveEdit(id: number) {
+    if (!canManageRoles()) return;
     const name = editName.trim();
     if (!name) return;
     if (isRootRole(name) && !isRoot) {
@@ -120,9 +126,10 @@ export default function AdminRolesPage() {
             onChange={(e) => setNewName(e.target.value)}
             placeholder="New role name"
             className="w-full rounded-md border px-3 py-2 text-sm bg-background"
+            disabled={!canManageRoles()}
           />
           <button
-            disabled={creating || !newName.trim() || (!isRoot && isRootRole(newName))}
+            disabled={!canManageRoles() || creating || !newName.trim() || (!isRoot && isRootRole(newName))}
             title={!isRoot && isRootRole(newName) ? TOOLTIP.onlyRootManageRootRole : undefined}
             className="rounded-md border px-3 py-2 text-sm disabled:opacity-50"
           >
@@ -174,7 +181,7 @@ export default function AdminRolesPage() {
                         <button
                           onClick={() => saveEdit(role.id)}
                           className="rounded-md border px-2 py-1 text-xs"
-                          disabled={!isRoot && isRootRole(editName)}
+                          disabled={!canManageRoles() || (!isRoot && isRootRole(editName))}
                           title={!isRoot && isRootRole(editName) ? TOOLTIP.onlyRootManageRootRole : undefined}
                         >
                           Save
@@ -186,7 +193,7 @@ export default function AdminRolesPage() {
                         <button
                           onClick={() => startEdit(role)}
                           className="rounded-md border px-2 py-1 text-xs"
-                          disabled={!isRoot && isRootRole(role.name)}
+                          disabled={!canManageRoles() || (!isRoot && isRootRole(role.name))}
                           title={!isRoot && isRootRole(role.name) ? TOOLTIP.onlyRootManageRootRole : undefined}
                         >
                           Edit
@@ -194,7 +201,7 @@ export default function AdminRolesPage() {
                         <button
                           onClick={() => askDeleteRole(role.id)}
                           className="rounded-md border px-2 py-1 text-xs text-red-600"
-                          disabled={!isRoot && isRootRole(role.name)}
+                          disabled={!canManageRoles() || (!isRoot && isRootRole(role.name))}
                           title={!isRoot && isRootRole(role.name) ? TOOLTIP.onlyRootManageRootRole : undefined}
                         >
                           Delete

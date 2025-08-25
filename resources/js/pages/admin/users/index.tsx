@@ -8,6 +8,7 @@ import AppLayout from '@/layouts/app-layout';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
 import { TOOLTIP } from '@/lib/perm-tooltips';
+import { makeAuthHelpers } from '@/lib/auth';
 
 // Read CSRF token from Blade layout meta tag
 const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
@@ -24,6 +25,7 @@ export default function AdminUsersPage() {
   const { auth } = usePage().props as any;
   const meId: number | null = auth?.user?.id ?? null;
   const isRoot: boolean = Boolean(auth?.isRoot);
+  const { canManageUsers } = makeAuthHelpers({ roles: auth?.roles || [], isAdmin: !!auth?.isAdmin, isRoot: !!auth?.isRoot });
   const { page, perPage, search, sortBy, sortDir, setPage, setPerPage, setSearch, setSort } = useDataTable({});
   const { show } = useToast();
   const [data, setData] = useState<User[]>([]);
@@ -49,8 +51,8 @@ export default function AdminUsersPage() {
     {
       key: 'actions',
       header: 'Actions',
-      render: (row: User) => (
-        <div className="flex gap-2">
+      render: (row: User) => {
+        const viewBtn = (
           <button
             className="rounded-md border px-2 py-1 text-xs"
             onClick={() => {
@@ -60,53 +62,56 @@ export default function AdminUsersPage() {
           >
             View
           </button>
-          {(() => {
-            const blockedEdit = Boolean(row.is_root) && !isRoot;
-            const titleEdit = blockedEdit ? TOOLTIP.onlyRootManageRootUser : undefined;
-            return (
-              <button
-                className="rounded-md border px-2 py-1 text-xs disabled:opacity-50"
-                disabled={blockedEdit}
-                title={titleEdit}
-                onClick={() => {
-                  if (blockedEdit) return;
-                  setEditing(row);
-                  setEditName(row.name);
-                  setEditOpen(true);
-                }}
-              >
-                Edit
-              </button>
-            );
-          })()}
-          {(() => {
-            const blockedRoot = Boolean(row.is_root) && !isRoot;
-            const blockedSelf = meId === row.id;
-            const blockedDelete = blockedRoot || blockedSelf;
-            const titleDelete = blockedSelf
-              ? TOOLTIP.cannotDeleteSelf
-              : blockedRoot
-              ? TOOLTIP.onlyRootManageRootUser
-              : undefined;
-            return (
-              <button
-                className="rounded-md border px-2 py-1 text-xs text-red-600 disabled:opacity-50"
-                disabled={blockedDelete}
-                title={titleDelete}
-                onClick={() => {
-                  if (blockedDelete) return;
-                  setDeleting(row);
-                  setConfirmOpen(true);
-                }}
-              >
-                Delete
-              </button>
-            );
-          })()}
-        </div>
-      ),
+        );
+
+        if (!canManageUsers()) {
+          return <div className="flex gap-2">{viewBtn}</div>;
+        }
+
+        const blockedEdit = Boolean(row.is_root) && !isRoot;
+        const titleEdit = blockedEdit ? TOOLTIP.onlyRootManageRootUser : undefined;
+        const blockedRoot = Boolean(row.is_root) && !isRoot;
+        const blockedSelf = meId === row.id;
+        const blockedDelete = blockedRoot || blockedSelf;
+        const titleDelete = blockedSelf
+          ? TOOLTIP.cannotDeleteSelf
+          : blockedRoot
+          ? TOOLTIP.onlyRootManageRootUser
+          : undefined;
+
+        return (
+          <div className="flex gap-2">
+            {viewBtn}
+            <button
+              className="rounded-md border px-2 py-1 text-xs disabled:opacity-50"
+              disabled={blockedEdit}
+              title={titleEdit}
+              onClick={() => {
+                if (blockedEdit) return;
+                setEditing(row);
+                setEditName(row.name);
+                setEditOpen(true);
+              }}
+            >
+              Edit
+            </button>
+            <button
+              className="rounded-md border px-2 py-1 text-xs text-red-600 disabled:opacity-50"
+              disabled={blockedDelete}
+              title={titleDelete}
+              onClick={() => {
+                if (blockedDelete) return;
+                setDeleting(row);
+                setConfirmOpen(true);
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        );
+      },
     },
-  ], [meId, isRoot]);
+  ], [meId, isRoot, canManageUsers]);
 
   useEffect(() => {
     const controller = new AbortController();

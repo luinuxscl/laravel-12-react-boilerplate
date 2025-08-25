@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useToast } from '@/hooks/useToast';
 import AppLayout from '@/layouts/app-layout';
+import { makeAuthHelpers } from '@/lib/auth';
 
 // Read CSRF token from Blade layout meta tag
 const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
@@ -9,6 +10,8 @@ const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMeta
 type SettingsMap = Record<string, unknown>;
 
 export default function AdminSettingsPage() {
+  const { auth } = usePage().props as any;
+  const { canManageSettings } = makeAuthHelpers({ roles: auth?.roles || [], isAdmin: !!auth?.isAdmin, isRoot: !!auth?.isRoot });
   const { show } = useToast();
   const [settings, setSettings] = useState<SettingsMap>({});
   const [loading, setLoading] = useState(false);
@@ -51,6 +54,7 @@ export default function AdminSettingsPage() {
   }
 
   async function upsert() {
+    if (!canManageSettings()) return;
     setJsonError('');
     if (!keyInput.trim()) {
       setJsonError('Key is required');
@@ -79,6 +83,7 @@ export default function AdminSettingsPage() {
   }
 
   async function removeKey(key: string) {
+    if (!canManageSettings()) return;
     try {
       const res = await fetch(`/admin/settings/${encodeURIComponent(key)}`, {
         method: 'DELETE',
@@ -110,6 +115,7 @@ export default function AdminSettingsPage() {
             placeholder="key (e.g. site.appearance)"
             value={keyInput}
             onChange={(e) => setKeyInput(e.target.value)}
+            disabled={!canManageSettings()}
           />
           <textarea
             className="w-full max-w-xl rounded-md border px-3 py-1.5 text-sm font-mono"
@@ -117,11 +123,12 @@ export default function AdminSettingsPage() {
             rows={4}
             value={valueInput}
             onChange={(e) => setValueInput(e.target.value)}
+            disabled={!canManageSettings()}
           />
         </div>
         {jsonError && <div className="text-sm text-red-600">{jsonError}</div>}
         <div className="flex items-center gap-2">
-          <button className="rounded-md border px-3 py-1.5 text-sm" onClick={upsert}>Save</button>
+          <button className="rounded-md border px-3 py-1.5 text-sm disabled:opacity-50" onClick={upsert} disabled={!canManageSettings()}>Save</button>
           <button className="rounded-md border px-3 py-1.5 text-sm" onClick={() => { setKeyInput(''); setValueInput('{}'); setJsonError(''); }}>Clear</button>
         </div>
       </div>
@@ -155,10 +162,12 @@ export default function AdminSettingsPage() {
                     <button
                       className="rounded-md border px-2 py-1 text-xs"
                       onClick={() => { setKeyInput(key); setValueInput(pretty(value)); }}
+                      disabled={!canManageSettings()}
                     >Edit</button>
                     <button
                       className="rounded-md border px-2 py-1 text-xs text-red-600"
                       onClick={() => removeKey(key)}
+                      disabled={!canManageSettings()}
                     >Delete</button>
                   </div>
                 </td>
