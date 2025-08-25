@@ -9,17 +9,17 @@ uses(RefreshDatabase::class);
 
 function makeAdmin(): User {
     $user = User::factory()->create(['email_verified_at' => now()]);
-    Role::findOrCreate('Admin', 'web');
-    $user->assignRole('Admin');
+    Role::findOrCreate('admin', 'web');
+    $user->assignRole('admin');
     return $user;
 }
 
 function makeRoot(): User {
     $user = User::factory()->create(['email_verified_at' => now()]);
     Role::findOrCreate('root', 'web');
-    Role::findOrCreate('Admin', 'web');
+    Role::findOrCreate('admin', 'web');
     $user->assignRole('root');
-    $user->assignRole('Admin'); // acceso a rutas /admin
+    $user->assignRole('admin'); // acceso a rutas /admin
     return $user;
 }
 

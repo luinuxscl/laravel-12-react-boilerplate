@@ -24,7 +24,7 @@ it('permite a Admin ver y actualizar un usuario', function () {
     $this->seed(RolesSeeder::class);
 
     $admin = User::factory()->create(['email_verified_at' => now()]);
-    $admin->assignRole('Admin');
+    $admin->assignRole('admin');
 
     $target = User::factory()->create(['name' => 'Old Name']);
 
@@ -43,7 +43,7 @@ it('valida nombre requerido al actualizar', function () {
     $this->seed(RolesSeeder::class);
 
     $admin = User::factory()->create(['email_verified_at' => now()]);
-    $admin->assignRole('Admin');
+    $admin->assignRole('admin');
 
     $target = User::factory()->create();
 

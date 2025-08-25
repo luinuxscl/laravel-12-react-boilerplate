@@ -10,7 +10,7 @@ uses(RefreshDatabase::class);
 it('lista roles para admin', function () {
     $this->seed(RolesSeeder::class);
     $admin = User::factory()->create(['email_verified_at' => now()]);
-    $admin->assignRole('Admin');
+    $admin->assignRole('admin');
 
     $this->actingAs($admin)
         ->getJson('/admin/roles')
@@ -22,7 +22,7 @@ it('lista roles para admin', function () {
 it('filtra usuarios por rol y rango de fechas', function () {
     $this->seed(RolesSeeder::class);
     $admin = User::factory()->create(['email_verified_at' => now()]);
-    $admin->assignRole('Admin');
+    $admin->assignRole('admin');
 
     // Crear usuarios con distintos roles
     Role::findOrCreate('Editor', 'web');

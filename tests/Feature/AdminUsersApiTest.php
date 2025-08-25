@@ -20,7 +20,7 @@ it('API retorna datos correctos para DataTable solo para Admin', function () {
 
     // Usuario admin -> 200 + estructura esperada
     $admin = User::factory()->create(['email_verified_at' => now()]);
-    $admin->assignRole('Admin');
+    $admin->assignRole('admin');
 
     $resp = $this->actingAs($admin)
         ->getJson('/admin/users?perPage=5&sortBy=id&sortDir=desc');

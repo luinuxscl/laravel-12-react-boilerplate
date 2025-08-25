@@ -13,9 +13,9 @@ it('usuario puede tener roles', function () {
         'email_verified_at' => now(),
     ]);
 
-    $user->assignRole('Admin');
+    $user->assignRole('admin');
 
-    expect($user->hasRole('Admin'))->toBeTrue();
+    expect($user->hasRole('admin'))->toBeTrue();
 });
 
 it('middleware bloquea acceso no autorizado a ruta admin', function () {
@@ -25,7 +25,7 @@ it('middleware bloquea acceso no autorizado a ruta admin', function () {
         'email_verified_at' => now(),
     ]);
 
-    // Usuario sin rol Admin intenta acceder
+    // Usuario sin rol admin intenta acceder
     $response = $this->actingAs($user)->get('/admin-only');
 
     $response->assertStatus(403);
@@ -37,7 +37,7 @@ it('admin puede gestionar usuarios (policy viewAny)', function () {
     $admin = User::factory()->create([
         'email_verified_at' => now(),
     ]);
-    $admin->assignRole('Admin');
+    $admin->assignRole('admin');
 
     expect($admin->can('viewAny', User::class))->toBeTrue();
 });

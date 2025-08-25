@@ -8,13 +8,13 @@ uses(RefreshDatabase::class);
 
 function makeAdminUser(): User {
     $user = User::factory()->create();
-    Role::findOrCreate('Admin');
-    $user->assignRole('Admin');
+    Role::findOrCreate('admin');
+    $user->assignRole('admin');
     return $user;
 }
 
 it('lists roles', function () {
-    Role::findOrCreate('Admin');
+    Role::findOrCreate('admin');
     Role::findOrCreate('Editor');
 
     $user = makeAdminUser();
@@ -23,7 +23,7 @@ it('lists roles', function () {
         ->getJson('/admin/roles')
         ->assertOk()
         ->assertJsonStructure(['data' => [['id', 'name']]])
-        ->assertJsonFragment(['name' => 'Admin'])
+        ->assertJsonFragment(['name' => 'admin'])
         ->assertJsonFragment(['name' => 'Editor']);
 });
 

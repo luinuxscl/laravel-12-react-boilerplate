@@ -20,7 +20,7 @@ it('impide auto-eliminación por Admin', function () {
     $this->seed(RolesSeeder::class);
 
     $admin = User::factory()->create(['email_verified_at' => now()]);
-    $admin->assignRole('Admin');
+    $admin->assignRole('admin');
 
     $this->actingAs($admin)
         ->deleteJson("/admin/users/{$admin->id}")
@@ -32,7 +32,7 @@ it('permite a Admin eliminar a otro usuario', function () {
     $this->seed(RolesSeeder::class);
 
     $admin = User::factory()->create(['email_verified_at' => now()]);
-    $admin->assignRole('Admin');
+    $admin->assignRole('admin');
 
     $target = User::factory()->create();
 
