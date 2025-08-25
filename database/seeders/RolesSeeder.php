@@ -18,10 +18,8 @@ class RolesSeeder extends Seeder
         // - Usuarios básicos NO llevan rol asignado por defecto.
         // - 'root': rol reservado a desarrolladores del sistema (super admin). Solo otro 'root' puede hacer CRUD sobre usuarios 'root'.
         // - 'admin': rol administrativo; puede configurar la app y gestionar usuarios y otros 'admin'.
-        // Se crean alias de compatibilidad por legado ('Admin' y 'Root') mientras se migra a minúsculas.
         $roles = [
-            'root', 'Root',
-            'admin', 'Admin',
+            'root', 'admin',
         ];
 
         foreach ($roles as $roleName) {
