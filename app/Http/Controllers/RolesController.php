@@ -6,7 +6,6 @@ use App\Http\Requests\RoleStoreRequest;
 use App\Http\Requests\RoleUpdateRequest;
 use App\Http\Resources\RoleResource;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
 
 class RolesController extends Controller
@@ -16,7 +15,7 @@ class RolesController extends Controller
      */
     public function index(): JsonResponse
     {
-        Gate::authorize('manage-roles');
+        $this->authorize('viewAny', Role::class);
         $roles = Role::query()->orderBy('name')->get();
 
         return response()->json([
@@ -30,11 +29,11 @@ class RolesController extends Controller
     public function store(RoleStoreRequest $request): JsonResponse
     {
         $name = $request->validated('name');
-        // Autorizar gestión de roles y protección especial para 'root'
+        // Autorizar creación general de roles via Policy
+        $this->authorize('create', Role::class);
+        // Protección especial para crear 'root'
         if (strtolower($name) === 'root') {
-            Gate::authorize('assign-root');
-        } else {
-            Gate::authorize('manage-roles', [null, [$name]]);
+            \Illuminate\Support\Facades\Gate::authorize('assign-root');
         }
 
         $role = Role::findOrCreate($name, 'web');
@@ -49,12 +48,8 @@ class RolesController extends Controller
      */
     public function destroy(Role $role): JsonResponse
     {
-        // Proteger rol 'root': solo root puede eliminarlo
-        if (strtolower($role->name) === 'root') {
-            Gate::authorize('assign-root');
-        } else {
-            Gate::authorize('manage-roles', [null, [$role->name]]);
-        }
+        // Autorización por Policy (maneja root-only)
+        $this->authorize('delete', $role);
 
         $role->delete();
 
@@ -68,11 +63,11 @@ class RolesController extends Controller
     {
         $newName = $request->validated('name');
 
-        // Si el rol objetivo es 'root' o se intenta renombrar a 'root', solo root autorizado
-        if (strtolower($role->name) === 'root' || strtolower($newName) === 'root') {
-            Gate::authorize('assign-root');
-        } else {
-            Gate::authorize('manage-roles', [null, [$newName]]);
+        // Autorización por Policy (maneja root-only si el rol objetivo es root)
+        $this->authorize('update', $role);
+        // Adicional: si se intenta renombrar a 'root', exigir privilegio root
+        if (strtolower($newName) === 'root') {
+            \Illuminate\Support\Facades\Gate::authorize('assign-root');
         }
 
         $role->name = $newName;
