@@ -17,7 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    // Ruta de ejemplo protegida por rol Admin
+    // Ruta de ejemplo protegida por acceso admin/root
     Route::get('admin-only', function () {
         return response('OK', 200);
     })->middleware('role:admin|root')->name('admin.only');
@@ -33,47 +33,61 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('notifications/index');
     })->name('notifications.ui');
 
-    // DataTable de usuarios (solo Admin)
-    Route::get('admin/users', [UsersController::class, 'index'])
-        ->middleware('role:admin|root')
-        ->name('admin.users.index');
-
-    // Roles CRUD (solo Admin)
+    // Área Admin (macro): requiere rol admin o root
     Route::middleware('role:admin|root')->group(function () {
-        Route::get('admin/roles', [RolesController::class, 'index'])->name('admin.roles.index.json');
-        Route::post('admin/roles', [RolesController::class, 'store'])->name('admin.roles.store');
-        Route::put('admin/roles/{role}', [RolesController::class, 'update'])->name('admin.roles.update');
-        Route::delete('admin/roles/{role}', [RolesController::class, 'destroy'])->name('admin.roles.destroy');
+        // Users
+        Route::get('admin/users', [UsersController::class, 'index'])
+            ->middleware('permission:users.view')
+            ->name('admin.users.index');
+        Route::get('admin/users/{user}', [UsersController::class, 'show'])
+            ->middleware('permission:users.view')
+            ->name('admin.users.show');
+        Route::put('admin/users/{user}', [UsersController::class, 'update'])
+            ->middleware('permission:users.manage')
+            ->name('admin.users.update');
+        Route::delete('admin/users/{user}', [UsersController::class, 'destroy'])
+            ->middleware('permission:users.manage')
+            ->name('admin.users.destroy');
+
+        // Roles (policy + permisos)
+        Route::get('admin/roles', [RolesController::class, 'index'])
+            ->middleware('permission:roles.view')
+            ->name('admin.roles.index.json');
+        Route::post('admin/roles', [RolesController::class, 'store'])
+            ->middleware('permission:roles.manage')
+            ->name('admin.roles.store');
+        Route::put('admin/roles/{role}', [RolesController::class, 'update'])
+            ->middleware('permission:roles.manage')
+            ->name('admin.roles.update');
+        Route::delete('admin/roles/{role}', [RolesController::class, 'destroy'])
+            ->middleware('permission:roles.manage')
+            ->name('admin.roles.destroy');
+
+        // Settings
+        Route::get('admin/settings', [AdminSettingsController::class, 'index'])
+            ->middleware('permission:settings.view')
+            ->name('admin.settings.index');
+        Route::put('admin/settings', [AdminSettingsController::class, 'update'])
+            ->middleware('permission:settings.manage')
+            ->name('admin.settings.update');
+        Route::delete('admin/settings/{key}', [AdminSettingsController::class, 'destroy'])
+            ->middleware('permission:settings.manage')
+            ->name('admin.settings.destroy');
+
+        // Páginas UI (requieren acceso a admin; sin permisos finos)
+        Route::get('admin/users-ui', function () {
+            return Inertia::render('admin/users/index');
+        })->name('admin.users.ui');
+
+        Route::get('admin/roles-ui', function () {
+            return Inertia::render('admin/roles/index');
+        })->name('admin.roles.ui');
+
+        Route::get('admin/settings-ui', [AdminSettingsController::class, 'page'])
+            ->name('admin.settings.ui');
     });
 
-    // Detalle y actualización de usuario (solo Admin)
-    Route::get('admin/users/{user}', [UsersController::class, 'show'])
-        ->middleware('role:admin|root')
-        ->name('admin.users.show');
-    Route::put('admin/users/{user}', [UsersController::class, 'update'])
-        ->middleware('role:admin|root')
-        ->name('admin.users.update');
-    Route::delete('admin/users/{user}', [UsersController::class, 'destroy'])
-        ->middleware('role:admin|root')
-        ->name('admin.users.destroy');
-
-    // Página UI para DataTable de usuarios (solo Admin)
-    Route::get('admin/users-ui', function () {
-        return Inertia::render('admin/users/index');
-    })->middleware('role:admin|root')->name('admin.users.ui');
-
-    // Página UI para Roles (solo Admin)
-    Route::get('admin/roles-ui', function () {
-        return Inertia::render('admin/roles/index');
-    })->middleware('role:admin|root')->name('admin.roles.ui');
-
-    // Admin Settings (simple CRUD)
-    Route::middleware('role:admin|root')->group(function () {
-        Route::get('admin/settings-ui', [AdminSettingsController::class, 'page'])->name('admin.settings.ui');
-        Route::get('admin/settings', [AdminSettingsController::class, 'index'])->name('admin.settings.index');
-        Route::put('admin/settings', [AdminSettingsController::class, 'update'])->name('admin.settings.update');
-        Route::delete('admin/settings/{key}', [AdminSettingsController::class, 'destroy'])->name('admin.settings.destroy');
-    });
+    
 });
 
 require __DIR__.'/settings.php';

@@ -26,9 +26,36 @@ class RolesSeeder extends Seeder
             Role::findOrCreate($roleName, 'web');
         }
 
-        // Nota: la asignación de permisos específicos se definirá según necesidad.
-        // Ejemplo (descomentando cuando se definan permisos):
-        // Permission::findOrCreate('users.manage', 'web');
-        // Role::findByName('admin', 'web')->givePermissionTo('users.manage');
+        // Permisos base del sistema (granularidad por módulo)
+        $permissions = [
+            // Users
+            'users.view',
+            'users.manage',
+            // Roles
+            'roles.view',
+            'roles.manage',
+            'roles.manage_root', // reservado a root
+            // Settings (opcional, ya que existe módulo admin settings)
+            'settings.view',
+            'settings.manage',
+        ];
+
+        foreach ($permissions as $perm) {
+            Permission::findOrCreate($perm, 'web');
+        }
+
+        // Asignación de permisos a roles
+        $admin = Role::findByName('admin', 'web');
+        $root = Role::findByName('root', 'web');
+
+        // Admin: todos menos roles.manage_root
+        $admin->syncPermissions([
+            'users.view', 'users.manage',
+            'roles.view', 'roles.manage',
+            'settings.view', 'settings.manage',
+        ]);
+
+        // Root: todos
+        $root->syncPermissions($permissions);
     }
 }
