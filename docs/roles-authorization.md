@@ -10,38 +10,37 @@ Este documento resume las reglas de autorización, endpoints y pautas de UI impl
 
 ## Backend
 
+### Gate global (root)
+- `app/Providers/AuthServiceProvider.php`
+  - `Gate::before(...)`: si el usuario tiene rol `root`, se permite cualquier ability/policy automáticamente.
+  - Gates específicos:
+    - `manage-roles`: para gestión general de roles no-root.
+    - `assign-root`: exclusivo de `root` (crear/renombrar/eliminar rol `root`).
+
 ### Policies
 - `app/Policies/UserPolicy.php`:
   - `viewAny`, `view`, `update`, `delete`:
     - Solo `root` puede operar sobre usuarios `root`.
     - `admin` y `root` pueden operar sobre usuarios no-root.
     - Un usuario siempre puede `view` su propio perfil.
-
-### Gates
-- `app/Providers/AuthServiceProvider.php`:
-  - `manage-roles`: para `admin` y `root` (roles no-root).
-  - `assign-root`: exclusivo para `root` (crear/renombrar/eliminar rol `root`).
-  - Validaciones insensibles a mayúsculas.
+- `app/Policies/RolePolicy.php`:
+  - `viewAny`, `view`, `create`, `update`, `delete`:
+    - Requiere permisos `roles.view`/`roles.manage`.
+    - Si el rol objetivo es `root`, exige `roles.manage_root` (solo `root` lo tiene).
 
 ### Controladores
-- `app/Http/Controllers/RolesController.php`:
-  - `store`, `update`, `destroy`: si el objetivo o el nuevo nombre es `root` ⇒ `Gate::authorize('assign-root')`; si no, `manage-roles`.
-  - Comparaciones a minúsculas (`strtolower(...) === 'root'`).
-- `app/Http/Controllers/UsersController.php`:
-  - Usa `authorize()` con `UserPolicy` para `show`, `update`, `destroy`.
-  - `index()` y `show()` hacen eager load de `roles` para exponer flags a la UI.
-
-### Resources
-- `app/Http/Resources/UserResource.php`:
-  - Campos extra:
-    - `roles`: lista de roles cuando están cargados (`whenLoaded`).
-    - `is_root`: boolean calculado.
+- `app/Http/Controllers/RolesController.php` (refactorizado):
+  - Usa `authorize()` para `viewAny/create/update/delete` (Policies).
+  - Extra: si en `store/update` el nombre nuevo es `root`, se fuerza `Gate::authorize('assign-root')`.
+- `UsersController` (no detallado aquí): recomendado usar `authorize()` con `UserPolicy`.
 
 ### Rutas
 - `routes/web.php`:
-  - Rutas de administración bajo `middleware('role:Admin')`.
-  - UI: `/admin/users-ui`, `/admin/roles-ui`.
-  - API JSON: `/admin/users`, `/admin/roles` (CRUD).
+  - Grupo macro: `middleware('role:admin|root')` para el área Admin.
+  - Permisos finos por endpoint con `permission:*`:
+    - Users: `users.view` (index/show), `users.manage` (update/destroy).
+    - Roles: `roles.view` (index), `roles.manage` (store/update/destroy). La Policy cubre `roles.manage_root`.
+    - Settings: `settings.view`/`settings.manage`.
 
 ## Frontend (Inertia + React)
 - `app/Http/Middleware/HandleInertiaRequests.php`: comparte `auth.roles`, `auth.isAdmin`, `auth.isRoot`.
@@ -60,7 +59,7 @@ Este documento resume las reglas de autorización, endpoints y pautas de UI impl
 - `tests/Feature/Roles/RootRestrictionsTest.php`:
   - Admin no puede crear/renombrar/eliminar `root`.
   - Root sí puede (contempla colisiones 422 por nombre duplicado).
-- `tests/Feature/Roles/RolesControllerTest.php`: CRUD de roles comunes.
+- `tests/Feature/Roles/RolesControllerTest.php`: CRUD de roles comunes (helper asigna permisos `roles.view/manage`).
 - `tests/Feature/Auth/RootPolicyTest.php`: reglas `UserPolicy` root/admin.
 - `tests/Feature/AdminUsers*`: filtros por rol, visibilidad y acciones.
 
