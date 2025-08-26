@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Head, usePage } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
 import type { SharedData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -311,3 +312,16 @@ export default function AdminBrandingPage() {
         </div>
     );
 }
+
+// Layout y breadcrumbs
+AdminBrandingPage.layout = (page: any) => (
+    <AppLayout
+        breadcrumbs={[
+            { title: 'Dashboard', href: '/dashboard' },
+            { title: 'Settings', href: '/admin/settings-ui' },
+            { title: 'Branding', href: '/admin/branding-ui' },
+        ]}
+    >
+        {page}
+    </AppLayout>
+);

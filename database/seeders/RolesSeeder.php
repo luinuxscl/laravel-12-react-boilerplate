@@ -48,11 +48,11 @@ class RolesSeeder extends Seeder
         $admin = Role::findByName('admin', 'web');
         $root = Role::findByName('root', 'web');
 
-        // Admin: todos menos roles.manage_root
+        // Admin: todos menos roles.manage_root y settings.manage
         $admin->syncPermissions([
             'users.view', 'users.manage',
             'roles.view', 'roles.manage',
-            'settings.view', 'settings.manage',
+            'settings.view',
         ]);
 
         // Root: todos
