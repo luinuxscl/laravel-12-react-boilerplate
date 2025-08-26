@@ -11,8 +11,7 @@ import { TOOLTIP } from '@/lib/perm-tooltips';
 import { makeAuthHelpers } from '@/lib/auth';
 import { useTranslation } from 'react-i18next';
 
-// Read CSRF token from Blade layout meta tag
-const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
+// CSRF token se leerá dentro del componente para evitar acceso temprano al DOM
 
 interface User {
   id: number;
@@ -25,6 +24,7 @@ interface User {
 export default function AdminUsersPage() {
   const { t } = useTranslation();
   const { auth } = usePage().props as any;
+  const csrfToken = useMemo(() => (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '', []);
   const meId: number | null = auth?.user?.id ?? null;
   const isRoot: boolean = Boolean(auth?.isRoot);
   const { canManageUsers } = makeAuthHelpers({ roles: auth?.roles || [], isAdmin: !!auth?.isAdmin, isRoot: !!auth?.isRoot });
@@ -132,6 +132,10 @@ export default function AdminUsersPage() {
         });
         const res = await fetch(`/admin/users?${params.toString()}`, { signal: controller.signal });
         if (!res.ok) throw new Error(`Request failed ${res.status}`);
+        const ct = res.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+          throw new Error('Unexpected response (not JSON)');
+        }
         const json = await res.json();
         setData(json.data as User[]);
         setMeta(json.meta);
@@ -152,8 +156,19 @@ export default function AdminUsersPage() {
   useEffect(() => {
     let mounted = true;
     fetch('/admin/roles')
-      .then((r) => r.json())
-      .then((j) => { if (mounted) setRoles(j.data || []); })
+      .then((r) => {
+        const ct = r.headers.get('content-type') || '';
+        if (!r.ok) throw new Error(`Request failed ${r.status}`);
+        if (!ct.includes('application/json')) throw new Error('Unexpected response (not JSON)');
+        return r.json();
+      })
+      .then((j) => {
+        if (!mounted) return;
+        const arr = Array.isArray(j?.data) ? j.data : [];
+        // Transformar a lista de nombres para el <select>
+        const names = arr.map((x: any) => (typeof x === 'string' ? x : x?.name)).filter(Boolean);
+        setRoles(names as string[]);
+      })
       .catch(() => {});
     return () => { mounted = false; };
   }, []);
