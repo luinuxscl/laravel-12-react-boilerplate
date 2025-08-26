@@ -22,7 +22,9 @@
     "search_placeholder": "Buscar…",
     "per_page": "{{count}} / página",
     "total": "Total: {{total}}",
-    "page": "Página {{current}} / {{last}}"
+    "page": "Página {{current}} / {{last}}",
+    "confirm_title": "¿Estás seguro?",
+    "confirm_description": "Esta acción no se puede deshacer."
   },
   "nav": {
     "dashboard": "Tablero",
@@ -34,6 +36,7 @@
   "actions": {
     "save": "Guardar",
     "cancel": "Cancelar",
+    "confirm": "Confirmar",
     "change_language": "Cambiar idioma",
     "view": "Ver",
     "edit": "Editar",

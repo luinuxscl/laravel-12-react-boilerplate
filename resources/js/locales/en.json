@@ -10,7 +10,9 @@
     "search_placeholder": "Search…",
     "per_page": "{{count}} / page",
     "total": "Total: {{total}}",
-    "page": "Page {{current}} / {{last}}"
+    "page": "Page {{current}} / {{last}}",
+    "confirm_title": "Are you sure?",
+    "confirm_description": "This action cannot be undone."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -22,6 +24,7 @@
   "actions": {
     "save": "Save",
     "cancel": "Cancel",
+    "confirm": "Confirm",
     "search": "Search",
     "prev": "Prev",
     "next": "Next",
