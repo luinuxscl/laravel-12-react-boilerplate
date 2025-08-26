@@ -2,11 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use App\Services\SettingsService;
 use App\Facades\Settings;
-use Inertia\Inertia;
+use App\Services\SettingsService;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
+use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Settings service singleton binding
         $this->app->singleton('settings', function () {
-            return new SettingsService();
+            return new SettingsService;
         });
     }
 

@@ -31,6 +31,7 @@ class AuthServiceProvider extends ServiceProvider
         // Root tiene acceso a todo (permite todos los abilities/policies)
         Gate::before(function (User $user, string $ability) {
             $hasRoot = collect($user->getRoleNames())->map(fn ($r) => strtolower($r))->contains('root');
+
             return $hasRoot ? true : null; // null => continuar con checks normales
         });
 

@@ -1,9 +1,9 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 use Spatie\Permission\Models\Role;
 
 Artisan::command('inspire', function () {
@@ -18,6 +18,7 @@ Artisan::command('user:create {--name=} {--email=} {--password=} {--role=}', fun
 
     if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $this->error('Invalid email. Use --email="user@example.com"');
+
         return 1;
     }
 
@@ -53,5 +54,6 @@ Artisan::command('user:create {--name=} {--email=} {--password=} {--role=}', fun
     }
 
     $this->comment('Login with the provided credentials at /login');
+
     return 0;
 })->purpose('Create or update a user and assign a role (Spatie)');

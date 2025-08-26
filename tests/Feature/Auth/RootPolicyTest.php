@@ -2,18 +2,19 @@
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
-function makeUserWithRole(?string $role = null): User {
+function makeUserWithRole(?string $role = null): User
+{
     /** @var User $user */
     $user = User::factory()->create();
     if ($role) {
         Role::findOrCreate($role, 'web');
         $user->assignRole($role);
     }
+
     return $user;
 }
 

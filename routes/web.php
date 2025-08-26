@@ -1,14 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\BrandingController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\RolesController;
+use App\Http\Controllers\UsersController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
-use App\Http\Controllers\RolesController;
-use App\Http\Controllers\NotificationsController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
-use App\Http\Controllers\Admin\BrandingController;
-use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -118,7 +117,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return back();
     })->name('locale.set');
 
-    
 });
 
 require __DIR__.'/settings.php';

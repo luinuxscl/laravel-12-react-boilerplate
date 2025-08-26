@@ -10,9 +10,9 @@ it('filtra notificaciones con allOnlyUnread y q', function () {
     $user = User::factory()->create(['email_verified_at' => now()]);
 
     // Crear varias notificaciones de demo
-    $user->notify(new DemoNotification());
-    $user->notify(new DemoNotification());
-    $user->notify(new DemoNotification());
+    $user->notify(new DemoNotification);
+    $user->notify(new DemoNotification);
+    $user->notify(new DemoNotification);
 
     // Marcar una como leída
     $first = $user->notifications()->first();
@@ -22,8 +22,8 @@ it('filtra notificaciones con allOnlyUnread y q', function () {
     $resp = $this->actingAs($user)->getJson('/notifications?perPage=2');
     $resp->assertOk()
         ->assertJsonStructure([
-            'unread' => ['data','current_page','last_page','per_page','total'],
-            'all' => ['data','current_page','last_page','per_page','total'],
+            'unread' => ['data', 'current_page', 'last_page', 'per_page', 'total'],
+            'all' => ['data', 'current_page', 'last_page', 'per_page', 'total'],
         ]);
 
     $json = $resp->json();

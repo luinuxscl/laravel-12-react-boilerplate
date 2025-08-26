@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Notifications\DemoNotification;
 use App\Http\Resources\NotificationResource;
+use App\Notifications\DemoNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
@@ -77,6 +77,7 @@ class NotificationsController extends Controller
         $user = Auth::user();
         $notification = $user->notifications()->findOrFail($id);
         $notification->markAsRead();
+
         return Response::json(['status' => 'ok']);
     }
 
@@ -87,6 +88,7 @@ class NotificationsController extends Controller
     {
         $user = Auth::user();
         $user->unreadNotifications()->update(['read_at' => now()]);
+
         return Response::json(['status' => 'ok']);
     }
 }

@@ -7,19 +7,23 @@ use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
-function makeAdmin(): User {
+function makeAdmin(): User
+{
     $user = User::factory()->create(['email_verified_at' => now()]);
     Role::findOrCreate('admin', 'web');
     $user->assignRole('admin');
+
     return $user;
 }
 
-function makeRoot(): User {
+function makeRoot(): User
+{
     $user = User::factory()->create(['email_verified_at' => now()]);
     Role::findOrCreate('root', 'web');
     Role::findOrCreate('admin', 'web');
     $user->assignRole('root');
     $user->assignRole('admin'); // acceso a rutas /admin
+
     return $user;
 }
 

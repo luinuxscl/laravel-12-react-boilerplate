@@ -70,6 +70,7 @@ class UserPolicy
     protected function hasRoleInsensitive(User $user, string $role): bool
     {
         $role = strtolower($role);
+
         return collect($user->getRoleNames())->map(fn ($r) => strtolower($r))->contains($role);
     }
 
@@ -77,6 +78,7 @@ class UserPolicy
     {
         $roles = array_map('strtolower', $roles);
         $userRoles = collect($user->getRoleNames())->map(fn ($r) => strtolower($r));
+
         return $userRoles->intersect($roles)->isNotEmpty();
     }
 }

@@ -18,20 +18,23 @@ class SettingsImport extends Command
         $prefix = (string) ($this->option('prefix') ?? '');
         $dry = (bool) $this->option('dry');
 
-        if (!$fs->exists($path)) {
+        if (! $fs->exists($path)) {
             $this->error("File not found: {$path}");
+
             return self::FAILURE;
         }
 
         try {
             $json = json_decode($fs->get($path), true, 512, JSON_THROW_ON_ERROR);
         } catch (\Throwable $e) {
-            $this->error('Invalid JSON: ' . $e->getMessage());
+            $this->error('Invalid JSON: '.$e->getMessage());
+
             return self::FAILURE;
         }
 
-        if (!is_array($json)) {
+        if (! is_array($json)) {
             $this->error('JSON root must be an object with key=>value');
+
             return self::FAILURE;
         }
 
@@ -39,7 +42,7 @@ class SettingsImport extends Command
         foreach ($json as $key => $value) {
             $fullKey = $prefix !== '' ? rtrim($prefix, '.').'.'.$key : $key;
             $written[$fullKey] = $value;
-            if (!$dry) {
+            if (! $dry) {
                 Settings::set($fullKey, $value);
             }
         }

@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Models\Setting;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\QueryException;
 
 class SettingsService
 {
@@ -15,11 +15,12 @@ class SettingsService
     {
         return Cache::rememberForever($this->cachePrefix.$key, function () use ($key, $default) {
             // En entorno de tests (o durante el arranque temprano), la tabla puede no existir aún.
-            if (!Schema::hasTable('settings')) {
+            if (! Schema::hasTable('settings')) {
                 return $default;
             }
             try {
                 $record = Setting::query()->where('key', $key)->first();
+
                 return $record?->value ?? $default;
             } catch (QueryException $e) {
                 // Si ocurre por migraciones aún no aplicadas, devolvemos el valor por defecto.
@@ -44,7 +45,7 @@ class SettingsService
 
     public function all(): array
     {
-        if (!Schema::hasTable('settings')) {
+        if (! Schema::hasTable('settings')) {
             return [];
         }
         try {

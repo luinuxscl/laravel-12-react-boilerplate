@@ -28,6 +28,7 @@ class RolePolicy
         if ($role->name === 'root') {
             return $user->can('roles.manage_root');
         }
+
         return $user->can('roles.manage');
     }
 
@@ -36,6 +37,7 @@ class RolePolicy
         if ($role->name === 'root') {
             return $user->can('roles.manage_root');
         }
+
         return $user->can('roles.manage');
     }
 }

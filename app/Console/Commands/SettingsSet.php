@@ -22,7 +22,8 @@ class SettingsSet extends Command
                 $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
                 $value = $decoded;
             } catch (\Throwable $e) {
-                $this->error('Invalid JSON: ' . $e->getMessage());
+                $this->error('Invalid JSON: '.$e->getMessage());
+
                 return self::FAILURE;
             }
         }

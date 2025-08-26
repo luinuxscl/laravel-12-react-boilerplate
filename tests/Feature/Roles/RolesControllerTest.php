@@ -1,13 +1,14 @@
 <?php
 
 use App\Models\User;
-use Spatie\Permission\PermissionRegistrar;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
 
-function makeAdminUser(): User {
+function makeAdminUser(): User
+{
     // Reset cache de permisos para el entorno de test
     app(PermissionRegistrar::class)->forgetCachedPermissions();
 
@@ -20,6 +21,7 @@ function makeAdminUser(): User {
     $admin->givePermissionTo(['roles.view', 'roles.manage']);
 
     $user->assignRole($admin);
+
     return $user;
 }
 

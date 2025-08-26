@@ -19,7 +19,7 @@ class BrandingController extends Controller
         ]);
 
         $file = $data['file'];
-        $path = $file->storeAs('branding', 'logo.' . $file->getClientOriginalExtension(), 'public');
+        $path = $file->storeAs('branding', 'logo.'.$file->getClientOriginalExtension(), 'public');
 
         // Guardar URL pública relativa (/storage/...) para evitar problemas de host/puerto
         $url = Storage::disk('public')->url($path);
@@ -46,7 +46,7 @@ class BrandingController extends Controller
         ]);
 
         $file = $data['file'];
-        $path = $file->storeAs('branding', 'favicon.' . $file->getClientOriginalExtension(), 'public');
+        $path = $file->storeAs('branding', 'favicon.'.$file->getClientOriginalExtension(), 'public');
 
         // Guardar URL pública relativa (/storage/...) para evitar problemas de host/puerto
         $url = Storage::disk('public')->url($path);

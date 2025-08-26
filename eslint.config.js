@@ -37,6 +37,12 @@ export default [
             'react-hooks/exhaustive-deps': 'warn',
         },
     },
+    // Temporary relaxation: allow 'any' as a warning while we gradually add types
+    {
+        rules: {
+            '@typescript-eslint/no-explicit-any': 'warn',
+        },
+    },
     {
         ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js'],
     },

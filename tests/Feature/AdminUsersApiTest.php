@@ -28,7 +28,7 @@ it('API retorna datos correctos para DataTable solo para Admin', function () {
     $resp->assertOk()
         ->assertJsonStructure([
             'data',
-            'meta' => ['total','per_page','current_page','last_page'],
+            'meta' => ['total', 'per_page', 'current_page', 'last_page'],
         ]);
 
     $json = $resp->json();

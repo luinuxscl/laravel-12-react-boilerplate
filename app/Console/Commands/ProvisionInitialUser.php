@@ -42,11 +42,13 @@ class ProvisionInitialUser extends Command
 
         if (! in_array($role, ['admin', 'root'], true)) {
             $this->error('El rol debe ser "admin" o "root".');
+
             return self::INVALID;
         }
 
         if ($email === '' || $name === '' || $password === '') {
             $this->error('Debe especificar --email, --name y --password.');
+
             return self::INVALID;
         }
 

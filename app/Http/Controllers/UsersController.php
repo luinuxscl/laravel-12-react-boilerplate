@@ -32,7 +32,7 @@ class UsersController extends Controller
         if ($search = $request->string('search')->toString()) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -54,7 +54,7 @@ class UsersController extends Controller
         // Ordenamiento
         $sortBy = $request->get('sortBy', 'id');
         $sortDir = strtolower($request->get('sortDir', 'desc')) === 'asc' ? 'asc' : 'desc';
-        $allowedSort = ['id','name','email','created_at'];
+        $allowedSort = ['id', 'name', 'email', 'created_at'];
         if (! in_array($sortBy, $allowedSort, true)) {
             $sortBy = 'id';
         }
@@ -86,6 +86,7 @@ class UsersController extends Controller
     {
         $this->authorize('view', $user);
         $user->load('roles');
+
         return response()->json(['data' => UserResource::make($user)]);
     }
 
@@ -116,6 +117,7 @@ class UsersController extends Controller
         }
 
         $user->delete();
+
         return response()->noContent(); // 204
     }
 }

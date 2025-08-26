@@ -50,6 +50,7 @@ class BoilerplateInstall extends Command
 
         $this->newLine();
         $this->info('Instalación completada.');
+
         return self::SUCCESS;
     }
 
@@ -100,7 +101,7 @@ class BoilerplateInstall extends Command
             );
 
             // Si ya existía, garantizamos nombre verificado para entornos de demo
-            if (!$user->wasRecentlyCreated) {
+            if (! $user->wasRecentlyCreated) {
                 $user->forceFill([
                     'name' => $data['name'],
                     'email_verified_at' => $user->email_verified_at ?: now(),
@@ -108,7 +109,7 @@ class BoilerplateInstall extends Command
             }
 
             // Sincronizar roles según política (usuario básico sin rol)
-            if (!empty($data['roles'])) {
+            if (! empty($data['roles'])) {
                 $user->syncRoles($data['roles']);
             } else {
                 $user->syncRoles([]);
