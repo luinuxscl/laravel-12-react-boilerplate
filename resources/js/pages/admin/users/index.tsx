@@ -9,6 +9,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
 import { TOOLTIP } from '@/lib/perm-tooltips';
 import { makeAuthHelpers } from '@/lib/auth';
+import { useTranslation } from 'react-i18next';
 
 // Read CSRF token from Blade layout meta tag
 const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
@@ -22,6 +23,7 @@ interface User {
 }
 
 export default function AdminUsersPage() {
+  const { t } = useTranslation();
   const { auth } = usePage().props as any;
   const meId: number | null = auth?.user?.id ?? null;
   const isRoot: boolean = Boolean(auth?.isRoot);
@@ -44,13 +46,13 @@ export default function AdminUsersPage() {
   const [createdTo, setCreatedTo] = useState<string>('');
 
   const columns: Column<User>[] = useMemo(() => [
-    { key: 'id', header: 'ID' },
-    { key: 'name', header: 'Name' },
-    { key: 'email', header: 'Email' },
-    { key: 'created_at', header: 'Created' },
+    { key: 'id', header: t('users.columns.id') },
+    { key: 'name', header: t('users.columns.name') },
+    { key: 'email', header: t('users.columns.email') },
+    { key: 'created_at', header: t('users.columns.created') },
     {
       key: 'actions',
-      header: 'Actions',
+      header: t('users.columns.actions'),
       render: (row: User) => {
         const viewBtn = (
           <button
@@ -60,7 +62,7 @@ export default function AdminUsersPage() {
               setViewOpen(true);
             }}
           >
-            View
+            {t('actions.view')}
           </button>
         );
 
@@ -93,7 +95,7 @@ export default function AdminUsersPage() {
                 setEditOpen(true);
               }}
             >
-              Edit
+              {t('actions.edit')}
             </button>
             <button
               className="rounded-md border px-2 py-1 text-xs text-red-600 disabled:opacity-50"
@@ -105,13 +107,13 @@ export default function AdminUsersPage() {
                 setConfirmOpen(true);
               }}
             >
-              Delete
+              {t('actions.delete')}
             </button>
           </div>
         );
       },
     },
-  ], [meId, isRoot, canManageUsers]);
+  ], [meId, isRoot, canManageUsers, t]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -136,8 +138,8 @@ export default function AdminUsersPage() {
       } catch (e: unknown) {
         const isAbort = e instanceof DOMException && e.name === 'AbortError';
         if (!isAbort) {
-          const msg = e instanceof Error ? e.message : 'Failed to load users';
-          show({ title: 'Error', description: msg });
+          const msg = e instanceof Error ? e.message : t('users.loading');
+          show({ title: t('status.error'), description: msg });
         }
       } finally {
         setLoading(false);
@@ -164,17 +166,17 @@ export default function AdminUsersPage() {
   return (
     <AppLayout>
       <div className="space-y-4 p-4">
-        <Head title="Admin · Users" />
+        <Head title={`${t('nav.admin')} · ${t('nav.users')}`} />
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Users</h1>
-          <Link href={route('dashboard')} className="text-sm underline">Back to Dashboard</Link>
+          <h1 className="text-xl font-semibold">{t('users.title')}</h1>
+          <Link href={route('dashboard')} className="text-sm underline">{t('users.back_to_dashboard')}</Link>
         </div>
 
       <div className="flex flex-wrap gap-2 items-center">
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name or email"
+          placeholder={t('users.search_placeholder')}
           className="w-64 rounded-md border px-3 py-1.5 text-sm"
         />
         <select
@@ -182,7 +184,7 @@ export default function AdminUsersPage() {
           onChange={(e) => setRole(e.target.value)}
           className="rounded-md border px-2 py-1 text-sm"
         >
-          <option value="">All roles</option>
+          <option value="">{t('users.all_roles')}</option>
           {roles.map((r) => (
             <option key={r} value={r}>{r}</option>
           ))}
@@ -203,7 +205,7 @@ export default function AdminUsersPage() {
           className="rounded-md border px-3 py-1.5 text-sm"
           onClick={() => { setSearch(''); setRole(''); setCreatedFrom(''); setCreatedTo(''); setPage(1); }}
         >
-          Clear
+          {t('actions.clear')}
         </button>
         <select
           value={perPage}
@@ -211,10 +213,10 @@ export default function AdminUsersPage() {
           className="rounded-md border px-2 py-1 text-sm"
         >
           {[5, 10, 25, 50].map((n) => (
-            <option key={n} value={n}>{n} / page</option>
+            <option key={n} value={n}>{t('users.per_page', { count: n })}</option>
           ))}
         </select>
-        <div className="text-xs text-muted-foreground">Total: {meta.total}</div>
+        <div className="text-xs text-muted-foreground">{t('users.total', { total: meta.total })}</div>
       </div>
 
       <div className="overflow-hidden rounded-md border">
@@ -232,8 +234,8 @@ export default function AdminUsersPage() {
           }))}
           data={data}
           loading={loading}
-          loadingComponent={<LoadingSpinner label="Loading users…" />}
-          emptyComponent={<EmptyState title="No users found" description="Try adjusting filters or search." />}
+          loadingComponent={<LoadingSpinner label={t('users.loading')} />}
+          emptyComponent={<EmptyState title={t('users.empty_title')} description={t('users.empty_description')} />}
           total={meta.total}
           page={meta.current_page}
           perPage={meta.per_page}
@@ -246,15 +248,15 @@ export default function AdminUsersPage() {
           onClick={() => setPage(meta.current_page - 1)}
           className="rounded-md border px-3 py-1.5 text-sm disabled:opacity-50"
         >
-          Prev
+          {t('actions.prev')}
         </button>
-        <div className="text-sm">Page {meta.current_page} / {meta.last_page}</div>
+        <div className="text-sm">{t('users.page', { current: meta.current_page, last: meta.last_page })}</div>
         <button
           disabled={meta.current_page >= meta.last_page}
           onClick={() => setPage(meta.current_page + 1)}
           className="rounded-md border px-3 py-1.5 text-sm disabled:opacity-50"
         >
-          Next
+          {t('actions.next')}
         </button>
       </div>
 
@@ -262,10 +264,10 @@ export default function AdminUsersPage() {
       <Modal
         open={editOpen}
         onClose={() => setEditOpen(false)}
-        title={editing ? `Edit user #${editing.id}` : 'Edit user'}
+        title={editing ? t('users.modals.edit_user_title', { id: editing.id }) : t('users.modals.edit_user_fallback')}
         footer={(
           <div className="flex items-center justify-end gap-2">
-            <button className="rounded-md border px-3 py-1.5 text-sm" onClick={() => setEditOpen(false)}>Cancel</button>
+            <button className="rounded-md border px-3 py-1.5 text-sm" onClick={() => setEditOpen(false)}>{t('actions.cancel')}</button>
             <button
               className="rounded-md border px-3 py-1.5 text-sm"
               onClick={async () => {
@@ -281,7 +283,7 @@ export default function AdminUsersPage() {
                     const msg = err?.message || `Update failed (${res.status})`;
                     throw new Error(msg);
                   }
-                  show({ title: 'Saved', description: 'User updated successfully' });
+                  show({ title: t('status.saved'), description: t('users.updated_success') });
                   setEditOpen(false);
                   // Refresh table
                   const params = new URLSearchParams({
@@ -293,23 +295,23 @@ export default function AdminUsersPage() {
                   setData(json.data as User[]);
                   setMeta(json.meta);
                 } catch (e: unknown) {
-                  const msg = e instanceof Error ? e.message : 'Failed to update user';
-                  show({ title: 'Error', description: msg });
+                  const msg = e instanceof Error ? e.message : t('users.updated_success');
+                  show({ title: t('status.error'), description: msg });
                 }
               }}
             >
-              Save
+              {t('actions.save')}
             </button>
           </div>
         )}
       >
         <div className="space-y-2">
-          <label className="block text-sm">Name</label>
+          <label className="block text-sm">{t('users.fields.name')}</label>
           <input
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             className="w-full rounded-md border px-3 py-1.5 text-sm"
-            placeholder="Full name"
+            placeholder={t('users.fields.full_name_placeholder')}
           />
         </div>
       </Modal>
@@ -318,15 +320,15 @@ export default function AdminUsersPage() {
       <Modal
         open={viewOpen}
         onClose={() => setViewOpen(false)}
-        title={viewing ? `User #${viewing.id}` : 'User'}
-        footer={<button className="rounded-md border px-3 py-1.5 text-sm" onClick={() => setViewOpen(false)}>Close</button>}
+        title={viewing ? t('users.modals.user_title', { id: viewing.id }) : t('users.modals.user_fallback')}
+        footer={<button className="rounded-md border px-3 py-1.5 text-sm" onClick={() => setViewOpen(false)}>{t('actions.close')}</button>}
       >
         {viewing && (
           <div className="space-y-2 text-sm">
-            <div><span className="font-medium">ID:</span> {viewing.id}</div>
-            <div><span className="font-medium">Name:</span> {viewing.name}</div>
-            <div><span className="font-medium">Email:</span> {viewing.email}</div>
-            <div><span className="font-medium">Created:</span> {new Date(viewing.created_at).toLocaleString()}</div>
+            <div><span className="font-medium">{t('users.columns.id')}:</span> {viewing.id}</div>
+            <div><span className="font-medium">{t('users.columns.name')}:</span> {viewing.name}</div>
+            <div><span className="font-medium">{t('users.columns.email')}:</span> {viewing.email}</div>
+            <div><span className="font-medium">{t('users.columns.created')}:</span> {new Date(viewing.created_at).toLocaleString()}</div>
           </div>
         )}
       </Modal>
@@ -335,10 +337,10 @@ export default function AdminUsersPage() {
       <Modal
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        title="Confirm delete"
+        title={t('users.confirm_delete')}
         footer={(
           <div className="flex items-center justify-end gap-2">
-            <button className="rounded-md border px-3 py-1.5 text-sm" onClick={() => setConfirmOpen(false)}>Cancel</button>
+            <button className="rounded-md border px-3 py-1.5 text-sm" onClick={() => setConfirmOpen(false)}>{t('actions.cancel')}</button>
             <button
               className="rounded-md border px-3 py-1.5 text-sm text-red-600"
               onClick={async () => {
@@ -346,7 +348,7 @@ export default function AdminUsersPage() {
                 try {
                   const res = await fetch(`/admin/users/${deleting.id}`, { method: 'DELETE', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken } });
                   if (!res.ok && res.status !== 204) throw new Error(`Delete failed (${res.status})`);
-                  show({ title: 'Deleted', description: `User #${deleting.id} deleted` });
+                  show({ title: t('status.deleted'), description: t('users.deleted_success', { id: deleting.id }) });
                   setConfirmOpen(false);
                   // Refresh table
                   const params = new URLSearchParams({ page: String(page), perPage: String(perPage), search: search || '', sortBy, sortDir, role: role || '', created_from: createdFrom || '', created_to: createdTo || '' });
@@ -355,17 +357,17 @@ export default function AdminUsersPage() {
                   setData(json.data as User[]);
                   setMeta(json.meta);
                 } catch (e: unknown) {
-                  const msg = e instanceof Error ? e.message : 'Failed to delete user';
-                  show({ title: 'Error', description: msg });
+                  const msg = e instanceof Error ? e.message : t('users.confirm_delete');
+                  show({ title: t('status.error'), description: msg });
                 }
               }}
             >
-              Delete
+              {t('actions.delete')}
             </button>
           </div>
         )}
       >
-        <div className="text-sm">Are you sure you want to delete this user? This action cannot be undone.</div>
+        <div className="text-sm">{t('users.confirm_delete_text')}</div>
       </Modal>
       </div>
     </AppLayout>

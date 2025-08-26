@@ -12,10 +12,109 @@
   "actions": {
     "save": "Save",
     "cancel": "Cancel",
-    "change_language": "Change language"
+    "change_language": "Change language",
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "prev": "Prev",
+    "next": "Next",
+    "clear": "Clear",
+    "close": "Close"
   },
   "language": {
     "english": "English",
     "spanish": "Spanish"
+  },
+  "status": {
+    "error": "Error",
+    "saved": "Saved",
+    "deleted": "Deleted"
+  },
+  "users": {
+    "title": "Users",
+    "back_to_dashboard": "Back to Dashboard",
+    "search_placeholder": "Search by name or email",
+    "all_roles": "All roles",
+    "per_page": "{{count}} / page",
+    "total": "Total: {{total}}",
+    "page": "Page {{current}} / {{last}}",
+    "loading": "Loading users…",
+    "empty_title": "No users found",
+    "empty_description": "Try adjusting filters or search.",
+    "confirm_delete": "Confirm delete",
+    "confirm_delete_text": "Are you sure you want to delete this user? This action cannot be undone.",
+    "updated_success": "User updated successfully",
+    "deleted_success": "User #{{id}} deleted",
+    "columns": {
+      "id": "ID",
+      "name": "Name",
+      "email": "Email",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "modals": {
+      "edit_user_title": "Edit user #{{id}}",
+      "edit_user_fallback": "Edit user",
+      "user_title": "User #{{id}}",
+      "user_fallback": "User"
+    },
+    "fields": {
+      "name": "Name",
+      "full_name_placeholder": "Full name"
+    }
+  },
+  "roles": {
+    "title": "Roles",
+    "back_to_dashboard": "Back to Dashboard",
+    "new_role_placeholder": "New role name",
+    "creating": "Creating…",
+    "create": "Create",
+    "loading": "Loading roles…",
+    "empty_title": "No roles found",
+    "empty_description": "Create a new role to get started.",
+    "columns": {
+      "id": "ID",
+      "name": "Name",
+      "actions": "Actions"
+    },
+    "confirm": {
+      "delete_title": "Delete role?",
+      "delete_description": "This action cannot be undone. Users with this role will lose the assignment.",
+      "delete_label": "Delete"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "settingsPage": {
+    "title": "Settings",
+    "back_to_dashboard": "Back to Dashboard",
+    "section_title": "Create / Update",
+    "key_placeholder": "key (e.g. site.appearance)",
+    "value_placeholder": "JSON value (e.g. {\"theme\":\"dark\"})",
+    "errors": {
+      "key_required": "Key is required",
+      "value_invalid": "Value must be valid JSON (or empty for null)"
+    },
+    "toasts": {
+      "saved_desc": "Setting \"{{key}}\" saved",
+      "deleted_desc": "Setting \"{{key}}\" deleted"
+    },
+    "table": {
+      "key": "Key",
+      "value": "Value",
+      "actions": "Actions",
+      "loading": "Loading...",
+      "empty": "No settings"
+    },
+    "buttons": {
+      "save": "Save",
+      "clear": "Clear",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
   }
 }

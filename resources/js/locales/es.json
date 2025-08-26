@@ -12,10 +12,109 @@
   "actions": {
     "save": "Guardar",
     "cancel": "Cancelar",
-    "change_language": "Cambiar idioma"
+    "change_language": "Cambiar idioma",
+    "view": "Ver",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "clear": "Limpiar",
+    "close": "Cerrar"
   },
   "language": {
     "english": "Inglés",
     "spanish": "Español"
+  },
+  "status": {
+    "error": "Error",
+    "saved": "Guardado",
+    "deleted": "Eliminado"
+  },
+  "users": {
+    "title": "Usuarios",
+    "back_to_dashboard": "Volver al Tablero",
+    "search_placeholder": "Buscar por nombre o email",
+    "all_roles": "Todos los roles",
+    "per_page": "{{count}} / página",
+    "total": "Total: {{total}}",
+    "page": "Página {{current}} / {{last}}",
+    "loading": "Cargando usuarios…",
+    "empty_title": "No se encontraron usuarios",
+    "empty_description": "Intenta ajustar filtros o la búsqueda.",
+    "confirm_delete": "Confirmar eliminación",
+    "confirm_delete_text": "¿Seguro que deseas eliminar este usuario? Esta acción no se puede deshacer.",
+    "updated_success": "Usuario actualizado correctamente",
+    "deleted_success": "Usuario #{{id}} eliminado",
+    "columns": {
+      "id": "ID",
+      "name": "Nombre",
+      "email": "Email",
+      "created": "Creado",
+      "actions": "Acciones"
+    },
+    "modals": {
+      "edit_user_title": "Editar usuario #{{id}}",
+      "edit_user_fallback": "Editar usuario",
+      "user_title": "Usuario #{{id}}",
+      "user_fallback": "Usuario"
+    },
+    "fields": {
+      "name": "Nombre",
+      "full_name_placeholder": "Nombre completo"
+    }
+  },
+  "roles": {
+    "title": "Roles",
+    "back_to_dashboard": "Volver al Tablero",
+    "new_role_placeholder": "Nombre de nuevo rol",
+    "creating": "Creando…",
+    "create": "Crear",
+    "loading": "Cargando roles…",
+    "empty_title": "No se encontraron roles",
+    "empty_description": "Crea un nuevo rol para comenzar.",
+    "columns": {
+      "id": "ID",
+      "name": "Nombre",
+      "actions": "Acciones"
+    },
+    "confirm": {
+      "delete_title": "¿Eliminar rol?",
+      "delete_description": "Esta acción no se puede deshacer. Los usuarios con este rol perderán la asignación.",
+      "delete_label": "Eliminar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    }
+  },
+  "settingsPage": {
+    "title": "Ajustes",
+    "back_to_dashboard": "Volver al Tablero",
+    "section_title": "Crear / Actualizar",
+    "key_placeholder": "clave (ej. site.appearance)",
+    "value_placeholder": "Valor JSON (ej. {\"theme\":\"dark\"})",
+    "errors": {
+      "key_required": "La clave es obligatoria",
+      "value_invalid": "El valor debe ser JSON válido (o vacío para null)"
+    },
+    "toasts": {
+      "saved_desc": "Setting \"{{key}}\" guardado",
+      "deleted_desc": "Setting \"{{key}}\" eliminado"
+    },
+    "table": {
+      "key": "Clave",
+      "value": "Valor",
+      "actions": "Acciones",
+      "loading": "Cargando...",
+      "empty": "Sin ajustes"
+    },
+    "buttons": {
+      "save": "Guardar",
+      "clear": "Limpiar",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    }
   }
 }
