@@ -4,10 +4,12 @@ import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { router, usePage } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 
 export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
     const page = usePage();
     const currentLocale = (page.props as any).locale ?? 'en';
+    const { t } = useTranslation();
 
     const setLocale = (locale: 'es' | 'en') => {
         if (locale === currentLocale) return;
@@ -28,8 +30,14 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setLocale('es')}>ES - Español</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setLocale('en')}>EN - English</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setLocale('es')}>
+                            <span className="mr-2 text-muted-foreground">ES</span>
+                            {t('language.spanish')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setLocale('en')}>
+                            <span className="mr-2 text-muted-foreground">EN</span>
+                            {t('language.english')}
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
