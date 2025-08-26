@@ -101,13 +101,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->middleware('permission:settings.manage')->name('admin.branding.ui');
     });
 
-    // Locale switcher (session-based)
+    // Locale switcher (session + persist in user if authenticated)
     Route::post('/locale', function (Request $request) {
         $data = $request->validate([
             'locale' => ['required', 'in:es,en'],
         ]);
 
+        // Guardar en sesión para invitados o cambio inmediato
         $request->session()->put('locale', $data['locale']);
+
+        // Persistir en el usuario autenticado (si existe)
+        if ($request->user()) {
+            $request->user()->forceFill(['locale' => $data['locale']])->save();
+        }
 
         return back();
     })->name('locale.set');
