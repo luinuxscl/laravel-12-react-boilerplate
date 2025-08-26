@@ -239,15 +239,20 @@ export default function AdminUsersPage() {
           columns={columns.map((c) => ({
             ...c,
             header: (
-              <button className="flex items-center gap-1" onClick={() => setSort(String(c.key))}>
-                {c.header}
-                {String(c.key) === sortBy && (
-                  <span className="text-[10px]">{sortDir === 'asc' ? '▲' : '▼'}</span>
-                )}
-              </button>
+              String(c.key) === 'actions'
+                ? c.header
+                : (
+                  <button className="flex items-center gap-1" onClick={() => setSort(String(c.key))}>
+                    {c.header}
+                    {String(c.key) === sortBy && (
+                      <span className="text-[10px]">{sortDir === 'asc' ? '▲' : '▼'}</span>
+                    )}
+                  </button>
+                )
             ),
           }))}
           data={data}
+          rowKey="id"
           loading={loading}
           loadingComponent={<LoadingSpinner label={t('users.loading')} />}
           emptyComponent={<EmptyState title={t('users.empty_title')} description={t('users.empty_description')} />}
@@ -293,8 +298,9 @@ export default function AdminUsersPage() {
                     headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken },
                     body: JSON.stringify({ name: editName }),
                   });
+                  const ctUpd = res.headers.get('content-type') || '';
                   if (!res.ok) {
-                    const err = await res.json().catch(() => ({}));
+                    const err = ctUpd.includes('application/json') ? await res.json().catch(() => ({})) : {};
                     const msg = err?.message || `Update failed (${res.status})`;
                     throw new Error(msg);
                   }
@@ -306,6 +312,8 @@ export default function AdminUsersPage() {
                     role: role || '', created_from: createdFrom || '', created_to: createdTo || '',
                   });
                   const refetch = await fetch(`/admin/users?${params.toString()}`);
+                  const ct = refetch.headers.get('content-type') || '';
+                  if (!ct.includes('application/json')) throw new Error('Unexpected response (not JSON)');
                   const json = await refetch.json();
                   setData(json.data as User[]);
                   setMeta(json.meta);
@@ -362,12 +370,19 @@ export default function AdminUsersPage() {
                 if (!deleting) return;
                 try {
                   const res = await fetch(`/admin/users/${deleting.id}`, { method: 'DELETE', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken } });
-                  if (!res.ok && res.status !== 204) throw new Error(`Delete failed (${res.status})`);
+                  if (!(res.ok || res.status === 204)) {
+                    const ctDel = res.headers.get('content-type') || '';
+                    const err = ctDel.includes('application/json') ? await res.json().catch(() => ({})) : {};
+                    const msg = err?.message || `Delete failed (${res.status})`;
+                    throw new Error(msg);
+                  }
                   show({ title: t('status.deleted'), description: t('users.deleted_success', { id: deleting.id }) });
                   setConfirmOpen(false);
                   // Refresh table
                   const params = new URLSearchParams({ page: String(page), perPage: String(perPage), search: search || '', sortBy, sortDir, role: role || '', created_from: createdFrom || '', created_to: createdTo || '' });
                   const refetch = await fetch(`/admin/users?${params.toString()}`);
+                  const ct = refetch.headers.get('content-type') || '';
+                  if (!ct.includes('application/json')) throw new Error('Unexpected response (not JSON)');
                   const json = await refetch.json();
                   setData(json.data as User[]);
                   setMeta(json.meta);

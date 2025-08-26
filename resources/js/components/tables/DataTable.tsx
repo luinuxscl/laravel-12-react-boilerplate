@@ -18,9 +18,10 @@ export type DataTableProps<T> = {
   onSearch?: (term: string) => void;
   loadingComponent?: React.ReactNode;
   emptyComponent?: React.ReactNode;
+  rowKey?: keyof T | ((row: T, index: number) => string | number);
 };
 
-export function DataTable<T>({ columns, data, loading, loadingComponent, emptyComponent }: DataTableProps<T>) {
+export function DataTable<T>({ columns, data, loading, loadingComponent, emptyComponent, rowKey }: DataTableProps<T>) {
 
   return (
     <div className="w-full overflow-x-auto">
@@ -62,7 +63,7 @@ export function DataTable<T>({ columns, data, loading, loadingComponent, emptyCo
           )}
 
           {!loading && data.map((row, i) => (
-            <tr key={i} className="border-b hover:bg-muted/30">
+            <tr key={String(typeof rowKey === 'function' ? rowKey(row, i) : rowKey ? (row as any)[rowKey] : i)} className="border-b hover:bg-muted/30">
               {columns.map((c) => (
                 <td key={String(c.key)} className="px-3 py-2">
                   {c.render ? c.render(row) : (() => {
