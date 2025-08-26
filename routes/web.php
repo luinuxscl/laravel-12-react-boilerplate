@@ -34,8 +34,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('notifications/index');
     })->name('notifications.ui');
 
-    // Área Admin (macro): requiere rol admin o root
-    Route::middleware('role:admin|root')->group(function () {
+    // Área Admin (macro): requiere rol admin o root, con rate limit y header AJAX para mutaciones
+    Route::middleware(['role:admin|root', 'throttle:admin', 'ajax'])->group(function () {
         // Users
         Route::get('admin/users', [UsersController::class, 'index'])
             ->middleware('permission:users.view')

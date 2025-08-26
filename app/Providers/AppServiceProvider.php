@@ -5,6 +5,9 @@ namespace App\Providers;
 use App\Facades\Settings;
 use App\Support\TenantContext;
 use App\Services\SettingsService;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
@@ -32,6 +35,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Rate limiter para endpoints administrativos
+        RateLimiter::for('admin', function (Request $request) {
+            // Limitar por usuario autenticado si existe; si no, por IP
+            $key = optional($request->user())->getAuthIdentifier() ?? $request->ip();
+            return Limit::perMinute(60)->by($key);
+        });
+
         // Compartir settings y tenant por-request mediante closures
         Inertia::share('tenant', function () {
             $tenant = app(TenantContext::class)->get();
