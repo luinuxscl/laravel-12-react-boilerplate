@@ -13,6 +13,18 @@ Este documento resume cómo funciona el PoC de multitenancy en este boilerplate 
 - Envía `X-Tenant: <slug>` en todas las requests a rutas admin que dependan del tenant.
 - En tests de Feature, esto se hace con `->withHeaders(['X-Tenant' => $tenant->slug])`.
 
+## Resolución de tenant (backend)
+
+- Servicio: `app/Services/TenantResolver.php`
+- Orden de resolución:
+  1. Header `X-Tenant` (útil en desarrollo y cuando `tenancy.allow_header=true`).
+  2. Dominio exacto (`tenant.domain`).
+  3. Subdominio `{slug}.domain.tld`.
+  4. Fallback por usuario autenticado: si hay un usuario con `tenant_id`, usa ese tenant.
+  5. Fallback final: tenant por defecto (`is_default = true`).
+
+Este fallback por usuario autenticado permite que, en desarrollo con host raíz (sin subdominio) y sin header, se resuelva el tenant correcto del usuario logueado.
+
 ## Datos y seeds
 
 - Roles se inicializan con `Database\Seeders\RolesSeeder` (`admin`, `root`, etc.).
@@ -34,6 +46,11 @@ Archivo: `resources/js/pages/admin/users/index.tsx`
 - Se valida `Content-Type` antes de parsear JSON en todas las llamadas `fetch` (listado, update, delete, refetchs).
 - La columna `actions` no es ordenable.
 - Las filas usan claves estables vía `rowKey="id"` en `DataTable`.
+
+### Envío automático de X-Tenant
+
+- El layout comparte `tenant` en props de Inertia (ver `AppServiceProvider` → `Inertia::share('tenant', ...)`).
+- En `resources/js/pages/admin/users/index.tsx` se lee `tenant.slug` y se construye `baseHeaders` con `X-Tenant` para todas las llamadas `fetch` (listado, roles, update, delete y refetchs).
 
 Componente `DataTable`: `resources/js/components/tables/DataTable.tsx`
 
