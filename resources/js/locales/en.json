@@ -3,7 +3,10 @@
     "name": "Boilerplate"
   },
   "common": {
-    "back_to_dashboard": "Back to Dashboard"
+    "back_to_dashboard": "Back to Dashboard",
+    "loading": "Loading…",
+    "empty_title": "Nothing here",
+    "empty_description": "No data to display."
   },
   "nav": {
     "dashboard": "Dashboard",

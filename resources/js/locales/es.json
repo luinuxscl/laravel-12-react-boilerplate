@@ -3,7 +3,10 @@
     "name": "Boilerplate"
   },
   "common": {
-    "back_to_dashboard": "Volver al Tablero"
+    "back_to_dashboard": "Volver al Tablero",
+    "loading": "Cargando…",
+    "empty_title": "Nada por aquí",
+    "empty_description": "No hay datos para mostrar."
   },
   "nav": {
     "dashboard": "Tablero",

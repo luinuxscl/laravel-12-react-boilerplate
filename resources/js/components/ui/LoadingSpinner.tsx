@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type LoadingSpinnerProps = {
   label?: string;
@@ -6,7 +7,9 @@ export type LoadingSpinnerProps = {
   size?: number; // px
 };
 
-export default function LoadingSpinner({ label = 'Loading…', className = '', size = 16 }: LoadingSpinnerProps) {
+export default function LoadingSpinner({ label, className = '', size = 16 }: LoadingSpinnerProps) {
+  const { t } = useTranslation();
+  const finalLabel = label ?? t('common.loading');
   return (
     <div className={`flex items-center gap-2 ${className}`} role="status" aria-live="polite" aria-busy="true">
       <svg
@@ -21,7 +24,7 @@ export default function LoadingSpinner({ label = 'Loading…', className = '', s
         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
       </svg>
-      <span className="text-sm text-muted-foreground select-none">{label}</span>
+      <span className="text-sm text-muted-foreground select-none">{finalLabel}</span>
     </div>
   );
 }
