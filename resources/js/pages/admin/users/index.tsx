@@ -23,8 +23,13 @@ interface User {
 
 export default function AdminUsersPage() {
   const { t } = useTranslation();
-  const { auth } = usePage().props as any;
+  const { auth, tenant } = usePage().props as any;
   const csrfToken = useMemo(() => (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '', []);
+  const tenantSlug: string | null = tenant?.slug ?? null;
+  const baseHeaders = useMemo(() => ({
+    'X-Requested-With': 'XMLHttpRequest',
+    ...(tenantSlug ? { 'X-Tenant': tenantSlug } : {}),
+  }), [tenantSlug]);
   const meId: number | null = auth?.user?.id ?? null;
   const isRoot: boolean = Boolean(auth?.isRoot);
   const { canManageUsers } = makeAuthHelpers({ roles: auth?.roles || [], isAdmin: !!auth?.isAdmin, isRoot: !!auth?.isRoot });
@@ -130,7 +135,7 @@ export default function AdminUsersPage() {
           created_from: createdFrom || '',
           created_to: createdTo || '',
         });
-        const res = await fetch(`/admin/users?${params.toString()}`, { signal: controller.signal });
+        const res = await fetch(`/admin/users?${params.toString()}`, { signal: controller.signal, headers: { ...baseHeaders } });
         if (!res.ok) throw new Error(`Request failed ${res.status}`);
         const ct = res.headers.get('content-type') || '';
         if (!ct.includes('application/json')) {
@@ -155,7 +160,7 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     let mounted = true;
-    fetch('/admin/roles')
+    fetch('/admin/roles', { headers: { ...baseHeaders } })
       .then((r) => {
         const ct = r.headers.get('content-type') || '';
         if (!r.ok) throw new Error(`Request failed ${r.status}`);
@@ -295,7 +300,7 @@ export default function AdminUsersPage() {
                 try {
                   const res = await fetch(`/admin/users/${editing.id}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken },
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, ...baseHeaders },
                     body: JSON.stringify({ name: editName }),
                   });
                   const ctUpd = res.headers.get('content-type') || '';
@@ -311,7 +316,7 @@ export default function AdminUsersPage() {
                     page: String(page), perPage: String(perPage), search: search || '', sortBy, sortDir,
                     role: role || '', created_from: createdFrom || '', created_to: createdTo || '',
                   });
-                  const refetch = await fetch(`/admin/users?${params.toString()}`);
+                  const refetch = await fetch(`/admin/users?${params.toString()}`, { headers: { ...baseHeaders } });
                   const ct = refetch.headers.get('content-type') || '';
                   if (!ct.includes('application/json')) throw new Error('Unexpected response (not JSON)');
                   const json = await refetch.json();
@@ -369,7 +374,7 @@ export default function AdminUsersPage() {
               onClick={async () => {
                 if (!deleting) return;
                 try {
-                  const res = await fetch(`/admin/users/${deleting.id}`, { method: 'DELETE', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken } });
+                  const res = await fetch(`/admin/users/${deleting.id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken, ...baseHeaders } });
                   if (!(res.ok || res.status === 204)) {
                     const ctDel = res.headers.get('content-type') || '';
                     const err = ctDel.includes('application/json') ? await res.json().catch(() => ({})) : {};
@@ -380,7 +385,7 @@ export default function AdminUsersPage() {
                   setConfirmOpen(false);
                   // Refresh table
                   const params = new URLSearchParams({ page: String(page), perPage: String(perPage), search: search || '', sortBy, sortDir, role: role || '', created_from: createdFrom || '', created_to: createdTo || '' });
-                  const refetch = await fetch(`/admin/users?${params.toString()}`);
+                  const refetch = await fetch(`/admin/users?${params.toString()}`, { headers: { ...baseHeaders } });
                   const ct = refetch.headers.get('content-type') || '';
                   if (!ct.includes('application/json')) throw new Error('Unexpected response (not JSON)');
                   const json = await refetch.json();

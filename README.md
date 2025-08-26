@@ -12,6 +12,7 @@ La documentación detallada por fases está en `docs/`:
 - FASE 4: Admin Users (UI + API) → [docs/fase-4-admin-users-ui.md](./docs/fase-4-admin-users-ui.md)
 - FASE 5: DX e Higiene → [docs/fase-5-dx.md](./docs/fase-5-dx.md)
 - FASE 6: Empaquetado y Release → [docs/fase-6-release.md](./docs/fase-6-release.md)
+ - Multitenancy PoC (aislamiento por tenant, header X-Tenant) → [docs/multitenancy-poc.md](./docs/multitenancy-poc.md)
 
 ## Requisitos
 

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Tenant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TenantResolver
 {
@@ -42,7 +43,19 @@ class TenantResolver
             return null;
         }
 
-        // 3) Root host fallback -> default tenant (if any)
+        // 3) Authenticated user's tenant fallback (useful on dev/root host)
+        if (Auth::check()) {
+            $user = Auth::user();
+            $userTenantId = $user?->tenant_id;
+            if ($userTenantId) {
+                $byUser = Tenant::query()->find($userTenantId);
+                if ($byUser) {
+                    return $byUser;
+                }
+            }
+        }
+
+        // 4) Root host fallback -> default tenant (if any)
         return Tenant::query()->where('is_default', true)->first();
     }
 }
