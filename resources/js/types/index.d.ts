@@ -28,6 +28,7 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    locale?: 'en' | 'es';
     app?: {
         name: string;
         appearance: { theme: 'system' | 'light' | 'dark' };

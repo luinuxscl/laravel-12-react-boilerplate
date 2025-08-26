@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { router, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
+import type { SharedData } from '@/types';
 
 export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
-    const page = usePage();
-    const currentLocale = (page.props as any).locale ?? 'en';
+    const page = usePage<SharedData>();
+    const currentLocale = page.props.locale ?? 'en';
     const { t } = useTranslation();
 
     const setLocale = (locale: 'es' | 'en') => {

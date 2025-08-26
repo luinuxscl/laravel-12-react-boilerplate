@@ -20,7 +20,7 @@ export default function AppLogo() {
                 displayLogoUrl = u.toString();
             }
         }
-    } catch (_) {
+    } catch {
         // keep original if parsing fails
         displayLogoUrl = logoUrl;
     }
@@ -31,7 +31,6 @@ export default function AppLogo() {
         <>
             <div className="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
                 {displayLogoUrl && !imgError ? (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                         src={displayLogoUrl}
                         alt={name}

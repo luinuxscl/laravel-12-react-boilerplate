@@ -191,7 +191,6 @@ export default function AdminBrandingPage() {
                 <div className="flex items-center gap-4">
                     <div className="flex size-16 items-center justify-center overflow-hidden rounded bg-neutral-100 p-1 dark:bg-neutral-800">
                         {logoPreviewUrl && !logoImgError ? (
-                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                                 src={logoPreviewUrl}
                                 alt={t('branding.logo_alt')}
@@ -214,7 +213,6 @@ export default function AdminBrandingPage() {
                 <div className="flex items-center gap-4">
                     <div className="flex size-12 items-center justify-center overflow-hidden rounded bg-neutral-100 p-1 dark:bg-neutral-800">
                         {faviconPreviewUrl && !faviconImgError ? (
-                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                                 src={faviconPreviewUrl}
                                 alt={t('branding.favicon_alt')}
