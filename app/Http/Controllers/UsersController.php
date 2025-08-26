@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Support\TenantContext;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
@@ -27,6 +28,14 @@ class UsersController extends Controller
         ]);
 
         $query = User::query()->with('roles');
+
+        // Scope por tenant (read-only listing)
+        if (config('tenancy.enabled', true)) {
+            $tenantId = app(TenantContext::class)->id();
+            if ($tenantId) {
+                $query->where('tenant_id', $tenantId);
+            }
+        }
 
         // Filtro de búsqueda simple por nombre o email
         if ($search = $request->string('search')->toString()) {
@@ -84,6 +93,13 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
+        // Bloquear acceso cross-tenant en PoC
+        if (config('tenancy.enabled', true)) {
+            $tenantId = app(TenantContext::class)->id();
+            if ($tenantId && $user->tenant_id !== $tenantId) {
+                abort(404);
+            }
+        }
         $this->authorize('view', $user);
         $user->load('roles');
 
@@ -95,6 +111,13 @@ class UsersController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        // Bloquear acceso cross-tenant en PoC
+        if (config('tenancy.enabled', true)) {
+            $tenantId = app(TenantContext::class)->id();
+            if ($tenantId && $user->tenant_id !== $tenantId) {
+                abort(404);
+            }
+        }
         $this->authorize('update', $user);
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -110,6 +133,13 @@ class UsersController extends Controller
      */
     public function destroy(Request $request, User $user)
     {
+        // Bloquear acceso cross-tenant en PoC
+        if (config('tenancy.enabled', true)) {
+            $tenantId = app(TenantContext::class)->id();
+            if ($tenantId && $user->tenant_id !== $tenantId) {
+                abort(404);
+            }
+        }
         $this->authorize('delete', $user);
         // Evitar auto-eliminación accidental via endpoint admin
         if ($request->user()->id === $user->id) {

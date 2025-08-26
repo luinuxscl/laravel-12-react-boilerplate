@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Setting;
+use App\Support\TenantContext;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
@@ -11,9 +12,21 @@ class SettingsService
 {
     protected string $cachePrefix = 'settings.';
 
+    protected function prefixForCache(): string
+    {
+        if (config('tenancy.enabled', true)) {
+            $tenantId = app(TenantContext::class)->id();
+            if ($tenantId) {
+                return "tenant.{$tenantId}.{$this->cachePrefix}";
+            }
+        }
+        return $this->cachePrefix;
+    }
+
     public function get(string $key, mixed $default = null): mixed
     {
-        return Cache::rememberForever($this->cachePrefix.$key, function () use ($key, $default) {
+        $prefix = $this->prefixForCache();
+        return Cache::rememberForever($prefix.$key, function () use ($key, $default) {
             // En entorno de tests (o durante el arranque temprano), la tabla puede no existir aún.
             if (! Schema::hasTable('settings')) {
                 return $default;
@@ -35,12 +48,13 @@ class SettingsService
             ['key' => $key],
             ['value' => $value],
         );
-        Cache::forever($this->cachePrefix.$key, $model->value);
+        $prefix = $this->prefixForCache();
+        Cache::forever($prefix.$key, $model->value);
     }
 
     public function forget(string $key): void
     {
-        Cache::forget($this->cachePrefix.$key);
+        Cache::forget($this->prefixForCache().$key);
     }
 
     public function all(): array

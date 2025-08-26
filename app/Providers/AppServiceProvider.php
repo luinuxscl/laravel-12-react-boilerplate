@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Facades\Settings;
+use App\Support\TenantContext;
 use App\Services\SettingsService;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -19,6 +20,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('settings', function () {
             return new SettingsService;
         });
+
+        // Tenant context per-request singleton
+        $this->app->singleton(TenantContext::class, function () {
+            return new TenantContext();
+        });
     }
 
     /**
@@ -26,25 +32,50 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Compartir settings mínimos necesarios para branding/appearance
-        $siteName = Settings::get('site.name', config('app.name'));
-        $appearance = Settings::get('site.appearance', ['theme' => 'system']);
-        $brand = Settings::get('site.brand', [
-            'logo_url' => null,
-            'favicon_url' => null,
-        ]);
+        // Compartir settings y tenant por-request mediante closures
+        Inertia::share('tenant', function () {
+            $tenant = app(TenantContext::class)->get();
+            if (! $tenant) {
+                return null;
+            }
+            return [
+                'id' => $tenant->id,
+                'name' => $tenant->name,
+                'slug' => $tenant->slug,
+                'domain' => $tenant->domain,
+                'is_default' => $tenant->is_default,
+            ];
+        });
 
-        Inertia::share('app', [
-            'name' => $siteName,
-            'appearance' => $appearance,
-            'brand' => $brand,
-        ]);
+        Inertia::share('app', function () {
+            $siteName = Settings::get('site.name', config('app.name'));
+            $appearance = Settings::get('site.appearance', ['theme' => 'system']);
+            $brand = Settings::get('site.brand', [
+                'logo_url' => null,
+                'favicon_url' => null,
+            ]);
 
-        // También para Blade (layout base)
-        View::share([
-            'appearance' => $appearance['theme'] ?? 'system',
-            'faviconUrl' => $brand['favicon_url'] ?? null,
-            'siteName' => $siteName,
-        ]);
+            return [
+                'name' => $siteName,
+                'appearance' => $appearance,
+                'brand' => $brand,
+            ];
+        });
+
+        // También para Blade (layout base) vía composer para evaluar por request
+        View::composer('*', function ($view) {
+            $appearance = Settings::get('site.appearance', ['theme' => 'system']);
+            $brand = Settings::get('site.brand', [
+                'logo_url' => null,
+                'favicon_url' => null,
+            ]);
+            $siteName = Settings::get('site.name', config('app.name'));
+
+            $view->with([
+                'appearance' => $appearance['theme'] ?? 'system',
+                'faviconUrl' => $brand['favicon_url'] ?? null,
+                'siteName' => $siteName,
+            ]);
+        });
     }
 }

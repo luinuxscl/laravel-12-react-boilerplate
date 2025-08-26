@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Facades\Settings;
+use App\Models\Tenant;
+use App\Support\TenantContext;
 use Illuminate\Database\Seeder;
 
 class SettingsSeeder extends Seeder
@@ -12,6 +14,14 @@ class SettingsSeeder extends Seeder
      */
     public function run(): void
     {
+        // Resolver tenant default y setear contexto temporal
+        $tenant = Tenant::query()->where('is_default', true)->first();
+        $context = app(TenantContext::class);
+        $original = $context->get();
+        if ($tenant) {
+            $context->set($tenant);
+        }
+
         // App/site base
         Settings::set('site.name', config('app.name'));
         Settings::set('site.appearance', [
@@ -35,5 +45,8 @@ class SettingsSeeder extends Seeder
 
         // Seguridad
         Settings::set('security.password_min_length', 8);
+
+        // Restaurar contexto
+        $context->set($original);
     }
 }
