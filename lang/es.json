@@ -1,0 +1,13 @@
+{
+  "app.name": "Boilerplate",
+  "nav.dashboard": "Tablero",
+  "nav.admin": "Administración",
+  "nav.users": "Usuarios",
+  "nav.roles": "Roles",
+  "nav.settings": "Ajustes",
+  "actions.save": "Guardar",
+  "actions.cancel": "Cancelar",
+  "actions.change_language": "Cambiar idioma",
+  "language.english": "Inglés",
+  "language.spanish": "Español"
+}

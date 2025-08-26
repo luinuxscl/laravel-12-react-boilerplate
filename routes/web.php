@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\UsersController;
@@ -99,6 +100,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('admin/settings/branding');
         })->middleware('permission:settings.manage')->name('admin.branding.ui');
     });
+
+    // Locale switcher (session-based)
+    Route::post('/locale', function (Request $request) {
+        $data = $request->validate([
+            'locale' => ['required', 'in:es,en'],
+        ]);
+
+        $request->session()->put('locale', $data['locale']);
+
+        return back();
+    })->name('locale.set');
 
     
 });
