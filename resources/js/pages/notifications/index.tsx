@@ -4,6 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useTranslation } from 'react-i18next';
 
 type Notification = {
   id: string;
@@ -26,6 +27,7 @@ type Paginated<T> = {
 };
 
 export default function NotificationsPage() {
+  const { t } = useTranslation();
   const [unread, setUnread] = useState<Paginated<Notification>>({ data: [], current_page: 1, last_page: 1, per_page: 10, total: 0 });
   const [all, setAll] = useState<Paginated<Notification>>({ data: [], current_page: 1, last_page: 1, per_page: 10, total: 0 });
   const [loading, setLoading] = useState(false);
@@ -94,45 +96,45 @@ export default function NotificationsPage() {
   return (
     <AppLayout>
       <div className="space-y-4 p-4">
-        <Head title="Notifications" />
+        <Head title={t('notifications.title')} />
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Notifications</h1>
-          <button className="rounded-md border px-3 py-1.5 text-sm" onClick={createDemo}>Create demo</button>
+          <h1 className="text-xl font-semibold">{t('notifications.title')}</h1>
+          <button className="rounded-md border px-3 py-1.5 text-sm" onClick={createDemo}>{t('notifications.create_demo')}</button>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="rounded-md border overflow-hidden">
             <div className="bg-muted/40 px-3 py-2 text-sm font-medium flex items-center justify-between">
-              <span>Unread ({unread.total})</span>
+              <span>{t('notifications.unread')} ({unread.total})</span>
               {unread.total > 0 && (
-                <button className="rounded-md border px-2 py-1 text-xs" onClick={() => setConfirmAllOpen(true)}>Mark all as read</button>
+                <button className="rounded-md border px-2 py-1 text-xs" onClick={() => setConfirmAllOpen(true)}>{t('notifications.mark_all_as_read')}</button>
               )}
             </div>
             <ul className="divide-y">
               {loading && (
                 <li className="px-3 py-2 text-sm text-muted-foreground">
-                  <LoadingSpinner label="Loading unread…" />
+                  <LoadingSpinner />
                 </li>
               )}
               {!loading && unread.data.length === 0 && (
                 <li className="px-3 py-2 text-sm text-muted-foreground">
-                  <EmptyState title="No unread notifications" description="You're all caught up." />
+                  <EmptyState />
                 </li>
               )}
               {!loading && unread.data.map((n) => (
                 <li key={n.id} className="px-3 py-2 text-sm flex items-start justify-between gap-4">
                   <div>
-                    <div className="font-medium">{n.data?.title ?? 'Notification'}</div>
+                    <div className="font-medium">{n.data?.title ?? t('notifications.notification')}</div>
                     <div className="text-muted-foreground text-xs">{n.data?.body ?? n.type}</div>
                   </div>
-                  <button className="rounded-md border px-2 py-1 text-xs" onClick={() => markAsRead(n.id)}>Mark as read</button>
+                  <button className="rounded-md border px-2 py-1 text-xs" onClick={() => markAsRead(n.id)}>{t('notifications.mark_as_read')}</button>
                 </li>
               ))}
             </ul>
             <div className="flex items-center justify-between px-3 py-2 border-t text-xs">
-              <button className="rounded-md border px-2 py-1 disabled:opacity-50" disabled={unread.current_page <= 1} onClick={unreadPrev}>Prev</button>
-              <span>Page {unread.current_page} / {unread.last_page}</span>
-              <button className="rounded-md border px-2 py-1 disabled:opacity-50" disabled={unread.current_page >= unread.last_page} onClick={unreadNext}>Next</button>
+              <button className="rounded-md border px-2 py-1 disabled:opacity-50" disabled={unread.current_page <= 1} onClick={unreadPrev}>{t('actions.prev')}</button>
+              <span>{t('common.page', { current: unread.current_page, last: unread.last_page })}</span>
+              <button className="rounded-md border px-2 py-1 disabled:opacity-50" disabled={unread.current_page >= unread.last_page} onClick={unreadNext}>{t('actions.next')}</button>
             </div>
           </div>
 
@@ -140,11 +142,11 @@ export default function NotificationsPage() {
             <div className="bg-muted/40 px-3 py-2 text-sm font-medium">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span>All ({all.total})</span>
+                  <span>{t('notifications.all')} ({all.total})</span>
                   <div className="flex items-center gap-2">
                     <label className="flex items-center gap-1 text-xs">
                       <input type="checkbox" checked={allOnlyUnread} onChange={(e) => { setAllOnlyUnread(e.target.checked); load({ allPage: 1 }); }} />
-                      Only unread
+                      {t('notifications.only_unread')}
                     </label>
                   </div>
                 </div>
@@ -153,42 +155,42 @@ export default function NotificationsPage() {
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') load({ allPage: 1 }); }}
-                    placeholder="Search title/body/type…"
+                    placeholder={t('common.search_placeholder')}
                     className="w-full rounded-md border px-3 py-2 text-xs bg-background"
                   />
-                  <button className="rounded-md border px-2 py-1 text-xs" onClick={() => load({ allPage: 1 })}>Search</button>
+                  <button className="rounded-md border px-2 py-1 text-xs" onClick={() => load({ allPage: 1 })}>{t('actions.search')}</button>
                 </div>
               </div>
             </div>
             <ul className="divide-y">
               {loading && (
                 <li className="px-3 py-2 text-sm text-muted-foreground">
-                  <LoadingSpinner label="Loading all…" />
+                  <LoadingSpinner />
                 </li>
               )}
               {!loading && all.data.length === 0 && (
                 <li className="px-3 py-2 text-sm text-muted-foreground">
-                  <EmptyState title="No notifications" description="There is nothing to show yet." />
+                  <EmptyState />
                 </li>
               )}
               {!loading && all.data.map((n) => (
                 <li key={n.id} className="px-3 py-2 text-sm">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <div className="font-medium">{n.data?.title ?? 'Notification'}</div>
+                      <div className="font-medium">{n.data?.title ?? t('notifications.notification')}</div>
                       <div className="text-muted-foreground text-xs">{n.data?.body ?? n.type}</div>
                     </div>
                     {!n.read_at && (
-                      <button className="rounded-md border px-2 py-1 text-xs" onClick={() => markAsRead(n.id)}>Mark as read</button>
+                      <button className="rounded-md border px-2 py-1 text-xs" onClick={() => markAsRead(n.id)}>{t('notifications.mark_as_read')}</button>
                     )}
                   </div>
                 </li>
               ))}
             </ul>
             <div className="flex items-center justify-between px-3 py-2 border-t text-xs">
-              <button className="rounded-md border px-2 py-1 disabled:opacity-50" disabled={all.current_page <= 1} onClick={allPrev}>Prev</button>
-              <span>Page {all.current_page} / {all.last_page}</span>
-              <button className="rounded-md border px-2 py-1 disabled:opacity-50" disabled={all.current_page >= all.last_page} onClick={allNext}>Next</button>
+              <button className="rounded-md border px-2 py-1 disabled:opacity-50" disabled={all.current_page <= 1} onClick={allPrev}>{t('actions.prev')}</button>
+              <span>{t('common.page', { current: all.current_page, last: all.last_page })}</span>
+              <button className="rounded-md border px-2 py-1 disabled:opacity-50" disabled={all.current_page >= all.last_page} onClick={allNext}>{t('actions.next')}</button>
             </div>
           </div>
         </div>
@@ -196,9 +198,10 @@ export default function NotificationsPage() {
           open={confirmAllOpen}
           onClose={() => setConfirmAllOpen(false)}
           onConfirm={markAll}
-          title="Mark all as read?"
-          description="This will mark all unread notifications as read."
-          confirmLabel="Mark all"
+          title={t('notifications.confirm_mark_all_title')}
+          description={t('notifications.confirm_mark_all_description')}
+          confirmLabel={t('notifications.mark_all_as_read')}
+          cancelLabel={t('actions.cancel')}
         />
       </div>
     </AppLayout>

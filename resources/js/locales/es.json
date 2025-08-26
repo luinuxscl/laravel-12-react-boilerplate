@@ -2,11 +2,27 @@
   "app": {
     "name": "Boilerplate"
   },
+  "notifications": {
+    "title": "Notificaciones",
+    "create_demo": "Crear demo",
+    "unread": "No leídas",
+    "all": "Todas",
+    "only_unread": "Solo no leídas",
+    "mark_all_as_read": "Marcar todas como leídas",
+    "mark_as_read": "Marcar como leída",
+    "notification": "Notificación",
+    "confirm_mark_all_title": "¿Marcar todas como leídas?",
+    "confirm_mark_all_description": "Esto marcará todas las notificaciones no leídas como leídas."
+  },
   "common": {
     "back_to_dashboard": "Volver al Tablero",
     "loading": "Cargando…",
     "empty_title": "Nada por aquí",
-    "empty_description": "No hay datos para mostrar."
+    "empty_description": "No hay datos para mostrar.",
+    "search_placeholder": "Buscar…",
+    "per_page": "{{count}} / página",
+    "total": "Total: {{total}}",
+    "page": "Página {{current}} / {{last}}"
   },
   "nav": {
     "dashboard": "Tablero",
@@ -24,6 +40,7 @@
     "delete": "Eliminar",
     "prev": "Anterior",
     "next": "Siguiente",
+    "search": "Buscar",
     "clear": "Limpiar",
     "close": "Cerrar"
   },

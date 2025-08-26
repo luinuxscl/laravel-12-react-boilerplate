@@ -138,7 +138,7 @@ export default function AdminUsersPage() {
       } catch (e: unknown) {
         const isAbort = e instanceof DOMException && e.name === 'AbortError';
         if (!isAbort) {
-          const msg = e instanceof Error ? e.message : t('users.loading');
+          const msg = e instanceof Error ? e.message : t('common.loading');
           show({ title: t('status.error'), description: msg });
         }
       } finally {
@@ -176,7 +176,7 @@ export default function AdminUsersPage() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={t('users.search_placeholder')}
+          placeholder={t('common.search_placeholder')}
           className="w-64 rounded-md border px-3 py-1.5 text-sm"
         />
         <select

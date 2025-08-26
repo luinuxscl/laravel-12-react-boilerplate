@@ -6,7 +6,11 @@
     "back_to_dashboard": "Back to Dashboard",
     "loading": "Loading…",
     "empty_title": "Nothing here",
-    "empty_description": "No data to display."
+    "empty_description": "No data to display.",
+    "search_placeholder": "Search…",
+    "per_page": "{{count}} / page",
+    "total": "Total: {{total}}",
+    "page": "Page {{current}} / {{last}}"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -18,14 +22,17 @@
   "actions": {
     "save": "Save",
     "cancel": "Cancel",
-    "change_language": "Change language",
-    "view": "View",
-    "edit": "Edit",
-    "delete": "Delete",
+    "search": "Search",
     "prev": "Prev",
     "next": "Next",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "change_language": "Change language",
     "clear": "Clear",
-    "close": "Close"
+    "close": "Close",
+    "create": "Create",
+    "update": "Update"
   },
   "language": {
     "english": "English",
@@ -122,6 +129,18 @@
       "edit": "Edit",
       "delete": "Delete"
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "create_demo": "Create demo",
+    "unread": "Unread",
+    "all": "All",
+    "only_unread": "Only unread",
+    "mark_all_as_read": "Mark all as read",
+    "mark_as_read": "Mark as read",
+    "notification": "Notification",
+    "confirm_mark_all_title": "Mark all as read?",
+    "confirm_mark_all_description": "This will mark all unread notifications as read."
   },
   "errors": {
     "403": {
