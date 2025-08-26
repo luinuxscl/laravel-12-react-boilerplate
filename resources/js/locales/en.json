@@ -2,6 +2,17 @@
   "app": {
     "name": "Boilerplate"
   },
+  "welcome": {
+    "head": "Welcome",
+    "get_started": "Let's get started",
+    "intro1": "Laravel has an incredibly rich ecosystem.",
+    "intro2": "We suggest starting with the following.",
+    "read_the": "Read the",
+    "watch_tutorials_at": "Watch video tutorials at",
+    "docs": "Documentation",
+    "laracasts": "Laracasts",
+    "deploy_now": "Deploy now"
+  },
   "branding": {
     "title": "Branding",
     "basic": "Basics",
@@ -50,6 +61,8 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "remove": "Remove",
+    "login": "Log in",
+    "register": "Register",
     "search": "Search",
     "prev": "Prev",
     "next": "Next",
@@ -185,7 +198,8 @@
     },
     "500": {
       "head": "Server Error",
-      "title": "Something went wrong on our side."
+      "title": "Something went wrong on our side.",
+      "message": "An unexpected server error occurred. Please try again later."
     }
   }
 }

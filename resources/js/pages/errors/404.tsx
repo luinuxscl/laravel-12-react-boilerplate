@@ -32,7 +32,7 @@ export default function Error404({ status = 404, message = 'Not Found' }: Props)
               <Link href={route('admin.settings.ui')} className="rounded-md border px-3 py-2 text-sm">{t('nav.settings')}</Link>
             </div>
           ) : (
-            <Link href={route('dashboard')} className="rounded-md border px-3 py-2 text-sm">{t('users.back_to_dashboard')}</Link>
+            <Link href={route('dashboard')} className="rounded-md border px-3 py-2 text-sm">{t('common.back_to_dashboard')}</Link>
           )}
         </div>
       </div>

@@ -8,7 +8,7 @@ type Props = {
   message?: string;
 };
 
-export default function Error500({ status = 500, message = 'Server error' }: Props) {
+export default function Error500({ status = 500, message }: Props) {
   const { t } = useTranslation();
   const { auth } = usePage().props as any;
   const isAdmin: boolean = Boolean(auth?.isAdmin);
@@ -19,7 +19,7 @@ export default function Error500({ status = 500, message = 'Server error' }: Pro
       <div className="mx-auto max-w-xl p-6 text-center space-y-3">
         <div className="text-6xl font-bold">{status}</div>
         <div className="text-lg font-medium">{t('errors.500.title')}</div>
-        <div className="text-sm text-muted-foreground">{message}</div>
+        <div className="text-sm text-muted-foreground">{message ?? t('errors.500.message')}</div>
         <div className="pt-2">
           {isRoot ? (
             <div className="flex items-center justify-center gap-2">

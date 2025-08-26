@@ -33,7 +33,7 @@ export default function Error403({ status = 403, message = 'Forbidden' }: Props)
               <Link href={route('admin.settings.ui')} className="rounded-md border px-3 py-2 text-sm">{t('nav.settings')}</Link>
             </div>
           ) : (
-            <Link href={route('dashboard')} className="rounded-md border px-3 py-2 text-sm">{t('users.back_to_dashboard')}</Link>
+            <Link href={route('dashboard')} className="rounded-md border px-3 py-2 text-sm">{t('common.back_to_dashboard')}</Link>
           )}
         </div>
       </div>

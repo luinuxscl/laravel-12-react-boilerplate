@@ -66,6 +66,8 @@
     "edit": "Editar",
     "delete": "Eliminar",
     "remove": "Quitar",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
     "prev": "Anterior",
     "next": "Siguiente",
     "search": "Buscar",
@@ -75,6 +77,17 @@
   "language": {
     "english": "Inglés",
     "spanish": "Español"
+  },
+  "welcome": {
+    "head": "Bienvenido",
+    "get_started": "Comencemos",
+    "intro1": "Laravel tiene un ecosistema increíblemente rico.",
+    "intro2": "Sugerimos empezar con lo siguiente.",
+    "read_the": "Lee la",
+    "watch_tutorials_at": "Mira tutoriales en",
+    "docs": "Documentación",
+    "laracasts": "Laracasts",
+    "deploy_now": "Desplegar ahora"
   },
   "status": {
     "error": "Error",
@@ -183,7 +196,8 @@
     },
     "500": {
       "head": "Error del servidor",
-      "title": "Algo salió mal de nuestro lado."
+      "title": "Algo salió mal de nuestro lado.",
+      "message": "Ocurrió un error inesperado del servidor. Por favor, inténtalo más tarde."
     }
   }
 }
