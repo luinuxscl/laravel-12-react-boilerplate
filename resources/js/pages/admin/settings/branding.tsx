@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminBrandingPage() {
+    const { t } = useTranslation();
     const page = usePage<SharedData>();
     const app = (page.props.app || {}) as SharedData['app'];
 
@@ -155,90 +157,86 @@ export default function AdminBrandingPage() {
 
     return (
         <div className="mx-auto w-full max-w-3xl space-y-8 p-6">
-            <Head title="Branding" />
-            <h1 className="text-2xl font-semibold">Branding</h1>
+            <Head title={t('branding.title')} />
+            <h1 className="text-2xl font-semibold">{t('branding.title')}</h1>
 
             <section className="space-y-4 rounded-lg border p-4">
-                <h2 className="text-lg font-medium">Básico</h2>
+                <h2 className="text-lg font-medium">{t('branding.basic')}</h2>
                 <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <Label htmlFor="site-name">Nombre del sitio</Label>
+                        <Label htmlFor="site-name">{t('branding.site_name')}</Label>
                         <Input id="site-name" value={siteName} onChange={(e) => setSiteName(e.target.value)} />
                     </div>
                     <div>
-                        <Label>Tema</Label>
-                        <Select value={theme} onValueChange={(v) => setTheme(v as any)}>
+                        <Label>{t('branding.theme')}</Label>
+                        <Select value={theme} onValueChange={(v: 'system' | 'light' | 'dark') => setTheme(v)}>
                             <SelectTrigger>
-                                <SelectValue placeholder="Tema" />
+                                <SelectValue placeholder={t('branding.theme')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="system">Sistema</SelectItem>
-                                <SelectItem value="light">Claro</SelectItem>
-                                <SelectItem value="dark">Oscuro</SelectItem>
+                                <SelectItem value="system">{t('branding.theme_system')}</SelectItem>
+                                <SelectItem value="light">{t('branding.theme_light')}</SelectItem>
+                                <SelectItem value="dark">{t('branding.theme_dark')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
                 </div>
                 <div>
-                    <Button onClick={handleSaveBasics}>Guardar</Button>
+                    <Button onClick={handleSaveBasics}>{t('actions.save')}</Button>
                 </div>
             </section>
 
             <section className="space-y-4 rounded-lg border p-4">
-                <h2 className="text-lg font-medium">Logo</h2>
+                <h2 className="text-lg font-medium">{t('branding.logo')}</h2>
                 <div className="flex items-center gap-4">
                     <div className="flex size-16 items-center justify-center overflow-hidden rounded bg-neutral-100 p-1 dark:bg-neutral-800">
                         {logoPreviewUrl && !logoImgError ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                                 src={logoPreviewUrl}
-                                alt="Logo"
+                                alt={t('branding.logo_alt')}
                                 className="max-h-full max-w-full object-contain"
                                 onError={() => setLogoImgError(true)}
                             />
                         ) : (
-                            <div className="text-sm text-neutral-500">Sin logo</div>
+                            <div className="text-sm text-neutral-500">{t('branding.no_logo')}</div>
                         )}
                     </div>
                     <div className="flex items-center gap-2">
                         <Input type="file" accept=".png,.svg,.webp" onChange={handleLogoChange} />
-                        <Button variant="outline" onClick={resetLogo} disabled={!logoUrl}>
-                            Quitar
-                        </Button>
+                        <Button variant="outline" onClick={resetLogo} disabled={!logoUrl}>{t('actions.remove')}</Button>
                     </div>
                 </div>
             </section>
 
             <section className="space-y-4 rounded-lg border p-4">
-                <h2 className="text-lg font-medium">Favicon</h2>
+                <h2 className="text-lg font-medium">{t('branding.favicon')}</h2>
                 <div className="flex items-center gap-4">
                     <div className="flex size-12 items-center justify-center overflow-hidden rounded bg-neutral-100 p-1 dark:bg-neutral-800">
                         {faviconPreviewUrl && !faviconImgError ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                                 src={faviconPreviewUrl}
-                                alt="Favicon"
+                                alt={t('branding.favicon_alt')}
                                 className="max-h-full max-w-full object-contain"
                                 onError={() => setFaviconImgError(true)}
                             />
                         ) : (
-                            <div className="text-sm text-neutral-500">Sin favicon</div>
+                            <div className="text-sm text-neutral-500">{t('branding.no_favicon')}</div>
                         )}
                     </div>
                     <div className="flex items-center gap-2">
                         <Input type="file" accept=".ico,.png,.svg" onChange={handleFaviconChange} />
-                        <Button variant="outline" onClick={resetFavicon} disabled={!faviconUrl}>
-                            Quitar
-                        </Button>
+                        <Button variant="outline" onClick={resetFavicon} disabled={!faviconUrl}>{t('actions.remove')}</Button>
                     </div>
                 </div>
             </section>
 
             <section className="space-y-4 rounded-lg border p-4">
-                <h2 className="text-lg font-medium">Depuración</h2>
+                <h2 className="text-lg font-medium">{t('branding.debug')}</h2>
                 <div className="grid gap-4">
                     <div className="grid gap-2">
-                        <div className="text-sm text-neutral-400">Valores actuales</div>
+                        <div className="text-sm text-neutral-400">{t('branding.current_values')}</div>
                         <pre className="overflow-auto rounded bg-neutral-900 p-3 text-xs text-neutral-100 dark:bg-neutral-800">
 {JSON.stringify({
     siteName,
@@ -257,42 +255,42 @@ export default function AdminBrandingPage() {
                             variant="outline"
                             onClick={async () => setLogoTest(await testFetch(logoUrl))}
                             disabled={!logoUrl}
-                            title="GET logo URL"
+                            title={t('branding.test_logo')}
                         >
-                            Probar logo
+                            {t('branding.test_logo')}
                         </Button>
                         <Button
                             variant="outline"
                             onClick={async () => setLogoTest(await testFetch(normalizedLogoUrl))}
                             disabled={!normalizedLogoUrl}
-                            title="GET normalized logo URL"
+                            title={t('branding.test_logo_normalized')}
                         >
-                            Probar logo normalizado
+                            {t('branding.test_logo_normalized')}
                         </Button>
                         <Button
                             variant="outline"
                             onClick={async () => setFaviconTest(await testFetch(faviconUrl))}
                             disabled={!faviconUrl}
-                            title="GET favicon URL"
+                            title={t('branding.test_favicon')}
                         >
-                            Probar favicon
+                            {t('branding.test_favicon')}
                         </Button>
                         <Button
                             variant="outline"
                             onClick={async () => setFaviconTest(await testFetch(normalizedFaviconUrl))}
                             disabled={!normalizedFaviconUrl}
-                            title="GET normalized favicon URL"
+                            title={t('branding.test_favicon_normalized')}
                         >
-                            Probar favicon normalizado
+                            {t('branding.test_favicon_normalized')}
                         </Button>
-                        <Button variant="secondary" onClick={refreshSettingsDump} title="GET /admin/settings">
-                            Refrescar settings
+                        <Button variant="secondary" onClick={refreshSettingsDump} title={t('branding.refresh_settings')}>
+                            {t('branding.refresh_settings')}
                         </Button>
                     </div>
 
                     {(logoTest || faviconTest) && (
                         <div className="grid gap-2">
-                            <div className="text-sm text-neutral-400">Resultados de prueba</div>
+                            <div className="text-sm text-neutral-400">{t('branding.test_results')}</div>
                             <pre className="overflow-auto rounded bg-neutral-900 p-3 text-xs text-neutral-100 dark:bg-neutral-800">
 {JSON.stringify({ logoTest, faviconTest }, null, 2)}
                             </pre>
@@ -301,7 +299,7 @@ export default function AdminBrandingPage() {
 
                     {settingsDump && (
                         <div className="grid gap-2">
-                            <div className="text-sm text-neutral-400">Dump de /admin/settings</div>
+                            <div className="text-sm text-neutral-400">{t('branding.settings_dump')}</div>
                             <pre className="overflow-auto rounded bg-neutral-900 p-3 text-xs text-neutral-100 dark:bg-neutral-800">
 {JSON.stringify(settingsDump, null, 2)}
                             </pre>

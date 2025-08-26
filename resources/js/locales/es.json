@@ -2,6 +2,30 @@
   "app": {
     "name": "Boilerplate"
   },
+  "branding": {
+    "title": "Branding",
+    "basic": "Básico",
+    "site_name": "Nombre del sitio",
+    "theme": "Tema",
+    "theme_system": "Sistema",
+    "theme_light": "Claro",
+    "theme_dark": "Oscuro",
+    "logo": "Logo",
+    "logo_alt": "Logo",
+    "no_logo": "Sin logo",
+    "favicon": "Favicon",
+    "favicon_alt": "Favicon",
+    "no_favicon": "Sin favicon",
+    "debug": "Depuración",
+    "current_values": "Valores actuales",
+    "test_results": "Resultados de prueba",
+    "settings_dump": "Dump de /admin/settings",
+    "test_logo": "Probar logo",
+    "test_logo_normalized": "Probar logo normalizado",
+    "test_favicon": "Probar favicon",
+    "test_favicon_normalized": "Probar favicon normalizado",
+    "refresh_settings": "Refrescar settings"
+  },
   "notifications": {
     "title": "Notificaciones",
     "create_demo": "Crear demo",
@@ -41,6 +65,7 @@
     "view": "Ver",
     "edit": "Editar",
     "delete": "Eliminar",
+    "remove": "Quitar",
     "prev": "Anterior",
     "next": "Siguiente",
     "search": "Buscar",

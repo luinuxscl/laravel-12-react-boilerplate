@@ -2,6 +2,30 @@
   "app": {
     "name": "Boilerplate"
   },
+  "branding": {
+    "title": "Branding",
+    "basic": "Basics",
+    "site_name": "Site name",
+    "theme": "Theme",
+    "theme_system": "System",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "logo": "Logo",
+    "logo_alt": "Logo",
+    "no_logo": "No logo",
+    "favicon": "Favicon",
+    "favicon_alt": "Favicon",
+    "no_favicon": "No favicon",
+    "debug": "Debug",
+    "current_values": "Current values",
+    "test_results": "Test results",
+    "settings_dump": "Dump of /admin/settings",
+    "test_logo": "Test logo",
+    "test_logo_normalized": "Test normalized logo",
+    "test_favicon": "Test favicon",
+    "test_favicon_normalized": "Test normalized favicon",
+    "refresh_settings": "Refresh settings"
+  },
   "common": {
     "back_to_dashboard": "Back to Dashboard",
     "loading": "Loading…",
@@ -25,6 +49,7 @@
     "save": "Save",
     "cancel": "Cancel",
     "confirm": "Confirm",
+    "remove": "Remove",
     "search": "Search",
     "prev": "Prev",
     "next": "Next",
