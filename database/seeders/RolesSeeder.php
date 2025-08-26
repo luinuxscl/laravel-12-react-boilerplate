@@ -44,15 +44,16 @@ class RolesSeeder extends Seeder
             Permission::findOrCreate($perm, 'web');
         }
 
-        // Asignación de permisos a roles
+        // Admin y Root
         $admin = Role::findByName('admin', 'web');
         $root = Role::findByName('root', 'web');
 
-        // Admin: todos menos roles.manage_root y settings.manage
+        // Admin: todos excepto roles.manage_root
+        // Nota: Se otorga settings.manage para permitir administrar la configuración desde el panel.
         $admin->syncPermissions([
             'users.view', 'users.manage',
             'roles.view', 'roles.manage',
-            'settings.view',
+            'settings.view', 'settings.manage',
         ]);
 
         // Root: todos
