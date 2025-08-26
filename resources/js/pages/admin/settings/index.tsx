@@ -106,7 +106,7 @@ export default function AdminSettingsPage() {
         <Head title={`${t('nav.admin')} · ${t('nav.settings')}`} />
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold">{t('settingsPage.title')}</h1>
-          <Link href={route('dashboard')} className="text-sm underline">{t('settingsPage.back_to_dashboard')}</Link>
+          <Link href={route('dashboard')} className="text-sm underline">{t('common.back_to_dashboard')}</Link>
         </div>
 
       <div className="rounded-md border p-3 space-y-2">

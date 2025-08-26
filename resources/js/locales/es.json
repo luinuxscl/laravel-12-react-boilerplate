@@ -2,6 +2,9 @@
   "app": {
     "name": "Boilerplate"
   },
+  "common": {
+    "back_to_dashboard": "Volver al Tablero"
+  },
   "nav": {
     "dashboard": "Tablero",
     "admin": "Administración",

@@ -119,7 +119,7 @@ export default function AdminRolesPage() {
         <Head title={`${t('nav.admin')} · ${t('roles.title')}`} />
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold">{t('roles.title')}</h1>
-          <Link href={route('dashboard')} className="text-sm underline">{t('roles.back_to_dashboard')}</Link>
+          <Link href={route('dashboard')} className="text-sm underline">{t('common.back_to_dashboard')}</Link>
         </div>
 
         <form onSubmit={createRole} className="rounded-md border p-3 flex items-center gap-2">

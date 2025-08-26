@@ -169,7 +169,7 @@ export default function AdminUsersPage() {
         <Head title={`${t('nav.admin')} · ${t('nav.users')}`} />
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold">{t('users.title')}</h1>
-          <Link href={route('dashboard')} className="text-sm underline">{t('users.back_to_dashboard')}</Link>
+          <Link href={route('dashboard')} className="text-sm underline">{t('common.back_to_dashboard')}</Link>
         </div>
 
       <div className="flex flex-wrap gap-2 items-center">

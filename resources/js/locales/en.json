@@ -2,6 +2,9 @@
   "app": {
     "name": "Boilerplate"
   },
+  "common": {
+    "back_to_dashboard": "Back to Dashboard"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "admin": "Admin",
