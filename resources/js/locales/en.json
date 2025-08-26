@@ -116,5 +116,23 @@
       "edit": "Edit",
       "delete": "Delete"
     }
+  },
+  "errors": {
+    "403": {
+      "head": "Forbidden",
+      "title": "You don’t have permission to access this page.",
+      "manage_roles": "Manage Roles",
+      "manage_users": "Manage Users"
+    },
+    "404": {
+      "head": "Not Found",
+      "title": "The page you’re looking for doesn’t exist.",
+      "go_to_roles": "Go to Roles",
+      "go_to_users": "Go to Users"
+    },
+    "500": {
+      "head": "Server Error",
+      "title": "Something went wrong on our side."
+    }
   }
 }

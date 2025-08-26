@@ -116,5 +116,23 @@
       "edit": "Editar",
       "delete": "Eliminar"
     }
+  },
+  "errors": {
+    "403": {
+      "head": "Prohibido",
+      "title": "No tienes permisos para acceder a esta página.",
+      "manage_roles": "Gestionar Roles",
+      "manage_users": "Gestionar Usuarios"
+    },
+    "404": {
+      "head": "No encontrado",
+      "title": "La página que buscas no existe.",
+      "go_to_roles": "Ir a Roles",
+      "go_to_users": "Ir a Usuarios"
+    },
+    "500": {
+      "head": "Error del servidor",
+      "title": "Algo salió mal de nuestro lado."
+    }
   }
 }

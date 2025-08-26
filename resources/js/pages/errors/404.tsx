@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   status: number;
@@ -8,29 +9,30 @@ type Props = {
 };
 
 export default function Error404({ status = 404, message = 'Not Found' }: Props) {
+  const { t } = useTranslation();
   const { auth } = usePage().props as any;
   const isAdmin: boolean = Boolean(auth?.isAdmin);
   const isRoot: boolean = Boolean(auth?.isRoot);
   return (
     <AppLayout>
-      <Head title={`${status} · Not Found`} />
+      <Head title={`${status} · ${t('errors.404.head')}`} />
       <div className="mx-auto max-w-xl p-6 text-center space-y-3">
         <div className="text-6xl font-bold">{status}</div>
-        <div className="text-lg font-medium">The page you’re looking for doesn’t exist.</div>
+        <div className="text-lg font-medium">{t('errors.404.title')}</div>
         <div className="text-sm text-muted-foreground">{message}</div>
         <div className="pt-2">
           {isRoot ? (
             <div className="flex items-center justify-center gap-2">
-              <Link href={route('admin.roles.ui')} className="rounded-md border px-3 py-2 text-sm">Go to Roles</Link>
-              <Link href={route('admin.users.ui')} className="rounded-md border px-3 py-2 text-sm">Go to Users</Link>
+              <Link href={route('admin.roles.ui')} className="rounded-md border px-3 py-2 text-sm">{t('errors.404.go_to_roles')}</Link>
+              <Link href={route('admin.users.ui')} className="rounded-md border px-3 py-2 text-sm">{t('errors.404.go_to_users')}</Link>
             </div>
           ) : isAdmin ? (
             <div className="flex items-center justify-center gap-2">
-              <Link href={route('admin.users.ui')} className="rounded-md border px-3 py-2 text-sm">Users</Link>
-              <Link href={route('admin.settings.ui')} className="rounded-md border px-3 py-2 text-sm">Settings</Link>
+              <Link href={route('admin.users.ui')} className="rounded-md border px-3 py-2 text-sm">{t('nav.users')}</Link>
+              <Link href={route('admin.settings.ui')} className="rounded-md border px-3 py-2 text-sm">{t('nav.settings')}</Link>
             </div>
           ) : (
-            <Link href={route('dashboard')} className="rounded-md border px-3 py-2 text-sm">Back to Dashboard</Link>
+            <Link href={route('dashboard')} className="rounded-md border px-3 py-2 text-sm">{t('users.back_to_dashboard')}</Link>
           )}
         </div>
       </div>
