@@ -60,6 +60,10 @@ npm run dev
   - API JSON con búsqueda, orden, paginación y filtros (rol, fecha)
   - UI con DataTable (skeleton/empty), View/Edit/Delete y toasts
 - Comando Artisan `user:create` para crear/promocionar usuarios con rol.
+ - Audit Logs (Auditoría):
+   - Endpoint JSON: `GET /admin/audit-logs` (filtros opcionales y paginación)
+   - UI Admin: `/admin/audit-logs-ui` (tabla con filtros + modal para ver `changes`)
+   - Registra acciones admin (create/update/delete) en Users, Roles y Settings
 
 ## Scripts útiles
 
