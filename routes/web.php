@@ -36,6 +36,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Área Admin (macro): requiere rol admin o root, con rate limit y header AJAX para mutaciones
     Route::middleware(['role:admin|root', 'throttle:admin', 'ajax'])->group(function () {
+        // Audit Logs
+        Route::get('admin/audit-logs', [\App\Http\Controllers\Admin\AuditLogsController::class, 'index'])
+            ->name('admin.audit_logs.index');
+
         // Users
         Route::get('admin/users', [UsersController::class, 'index'])
             ->middleware('permission:users.view')
@@ -98,6 +102,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('admin/branding-ui', function () {
             return Inertia::render('admin/settings/branding');
         })->middleware('permission:settings.manage')->name('admin.branding.ui');
+
+        // Audit Logs UI
+        Route::get('admin/audit-logs-ui', function () {
+            return Inertia::render('admin/audit-logs/index');
+        })->name('admin.audit_logs.ui');
     });
 
     // Locale switcher (session + persist in user if authenticated)
