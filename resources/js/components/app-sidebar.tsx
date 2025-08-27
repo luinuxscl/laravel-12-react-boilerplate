@@ -5,7 +5,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuBadge, useSidebar } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Cog, Users, Shield, Bell } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Cog, Users, Shield, Bell, History } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import AppLogo from './app-logo';
 
@@ -158,6 +158,14 @@ export function AppSidebar() {
                                                     <Link href="/admin/settings-ui" prefetch>
                                                         <Cog />
                                                         <span>Settings</span>
+                                                    </Link>
+                                                </SidebarMenuSubButton>
+                                            </li>
+                                            <li>
+                                                <SidebarMenuSubButton asChild isActive={page.url.startsWith('/admin/audit-logs')}>
+                                                    <Link href="/admin/audit-logs-ui" prefetch>
+                                                        <History />
+                                                        <span>Audit Logs</span>
                                                     </Link>
                                                 </SidebarMenuSubButton>
                                             </li>

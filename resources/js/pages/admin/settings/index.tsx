@@ -104,9 +104,12 @@ export default function AdminSettingsPage() {
     <AppLayout>
       <div className="space-y-4 p-4">
         <Head title={`${t('nav.admin')} · ${t('nav.settings')}`} />
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <h1 className="text-xl font-semibold">{t('settingsPage.title')}</h1>
-          <Link href={route('dashboard')} className="text-sm underline">{t('common.back_to_dashboard')}</Link>
+          <div className="flex items-center gap-2">
+            <Link href="/admin/audit-logs-ui" className="rounded-md border px-3 py-1.5 text-sm">Audit Logs</Link>
+            <Link href={route('dashboard')} className="text-sm underline">{t('common.back_to_dashboard')}</Link>
+          </div>
         </div>
 
       <div className="rounded-md border p-3 space-y-2">
