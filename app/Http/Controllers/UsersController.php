@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Services\AuditLogger;
 use App\Support\TenantContext;
 use Illuminate\Http\Request;
 
@@ -123,7 +124,15 @@ class UsersController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
 
+        $before = $user->only(['name']);
         $user->update($data);
+        $after = $user->only(['name']);
+
+        // Audit log
+        app(AuditLogger::class)->log('update', $user, null, [
+            'before' => $before,
+            'after' => $after,
+        ]);
 
         return response()->json(['data' => UserResource::make($user->fresh())]);
     }
@@ -146,7 +155,13 @@ class UsersController extends Controller
             return response()->json(['message' => 'You cannot delete yourself.'], 422);
         }
 
+        $snapshot = $user->only(['id', 'name', 'email']);
         $user->delete();
+
+        // Audit log
+        app(AuditLogger::class)->log('delete', User::class, $snapshot['id'], [
+            'snapshot' => $snapshot,
+        ]);
 
         return response()->noContent(); // 204
     }

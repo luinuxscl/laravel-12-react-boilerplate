@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Facades\Settings;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\AuditLogger;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -38,7 +39,21 @@ class SettingsController extends Controller
             'value' => ['nullable'], // valor puede ser escalar o array JSON
         ]);
 
+        $before = [
+            'key' => $data['key'],
+            'value' => Settings::get($data['key']),
+        ];
         Settings::set($data['key'], $data['value'] ?? null);
+        $after = [
+            'key' => $data['key'],
+            'value' => Settings::get($data['key']),
+        ];
+
+        // Audit log
+        app(AuditLogger::class)->log('update', Setting::class, $data['key'], [
+            'before' => $before,
+            'after' => $after,
+        ]);
 
         return response()->json([
             'data' => [
@@ -53,8 +68,17 @@ class SettingsController extends Controller
      */
     public function destroy(string $key)
     {
+        $snapshot = [
+            'key' => $key,
+            'value' => Settings::get($key),
+        ];
         Setting::query()->where('key', $key)->delete();
         Settings::forget($key);
+
+        // Audit log
+        app(AuditLogger::class)->log('delete', Setting::class, $key, [
+            'snapshot' => $snapshot,
+        ]);
 
         return response()->noContent();
     }
