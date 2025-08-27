@@ -19,13 +19,13 @@ class AuditLogsController extends Controller
         $validated = $request->validate([
             'page' => ['sometimes', 'integer', 'min:1'],
             'perPage' => ['sometimes', 'integer', 'in:5,10,25,50,100'],
-            'entity_type' => ['sometimes', 'string', 'max:100'],
-            'entity_id' => ['sometimes', 'integer'],
-            'action' => ['sometimes', 'in:create,update,delete'],
-            'user_id' => ['sometimes', 'integer'],
-            'created_from' => ['sometimes', 'date'],
-            'created_to' => ['sometimes', 'date'],
-            'search' => ['sometimes', 'string', 'max:255'], // buscar en ip, user_agent
+            'entity_type' => ['nullable', 'string', 'max:100'],
+            'entity_id' => ['nullable', 'integer'],
+            'action' => ['nullable', 'in:create,update,delete'],
+            'user_id' => ['nullable', 'integer'],
+            'created_from' => ['nullable', 'date'],
+            'created_to' => ['nullable', 'date'],
+            'search' => ['nullable', 'string', 'max:255'], // buscar en ip, user_agent
         ]);
 
         $perPage = (int)($validated['perPage'] ?? 10);
