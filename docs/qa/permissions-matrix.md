@@ -101,3 +101,61 @@ Notas:
 
 - Registrar resultados de ejecución (fecha, commit) y anexar capturas/logs cuando aplique.
 - Issues derivados: enumerar y linkear si se detectan gaps.
+
+## Policies, Gates y middlewares relevantes
+
+- Macro Admin: `auth` + `verified` + `role:admin|root` + `throttle:admin` + `ajax` (para mutaciones).
+- Permisos finos (Spatie): `users.view`, `users.manage`, `roles.view`, `roles.manage`, `settings.view`, `settings.manage`.
+- Gatillos de UI: las páginas `*-ui` dependen de acceso admin/root; las acciones de mutación siempre deben validar permisos finos en backend.
+- Considerar, si aplica, una distinción adicional para operaciones de alto riesgo (p.ej., `roles.manage_root`). Si no existe aún, evaluar su necesidad y alcance.
+
+## Checklist de verificación
+
+- [ ] Usuarios con rol `user` no pueden acceder a `admin/*` (esperado 403).
+- [ ] Usuarios con rol `admin` pueden ver y gestionar según permisos finos; no saltan restricciones adicionales (si existen root-only).
+- [ ] Usuario `root` puede acceder a todo el macro Admin y a las operaciones sensibles.
+- [ ] Mutaciones requieren cabecera AJAX (`X-Requested-With`) y respetan `throttle:admin`.
+- [ ] Self-delete o acciones peligrosas tienen salvaguardas (403/422) y quedan auditadas (si corresponde).
+- [ ] Las páginas UI ocultan/deshabilitan controles según permisos y muestran feedback adecuado.
+
+## Casos de prueba propuestos (Feature)
+
+Datos seed sugeridos:
+- `root@example.com` con rol `root`.
+- `admin@example.com` con rol `admin` y permisos: `users.view`, `users.manage`, `roles.view`, `roles.manage`, `settings.view`, `settings.manage`.
+- `user@example.com` con rol `user` (sin permisos admin).
+
+Casos:
+1. Acceso macro Admin
+   - user → GET `admin/audit-logs` => 403
+   - admin → GET `admin/audit-logs` => 200
+   - root → GET `admin/audit-logs` => 200
+2. Users
+   - admin/root → GET `admin/users` => 200; user => 403
+   - admin/root → PUT/DELETE `admin/users/{user}` => 200/204; user => 403
+   - self-delete desde Admin produce 422/403 según regla definida
+3. Roles
+   - admin/root con `roles.view` → GET `admin/roles` => 200; user => 403
+   - admin/root con `roles.manage` → POST/PUT/DELETE roles => 201/204; user => 403
+   - si existe distinción root-only, admin debe obtener 403 en operaciones restringidas
+4. Settings & Branding
+   - admin/root con `settings.view` → GET `admin/settings` => 200; user => 403
+   - admin/root con `settings.manage` → PUT/DELETE/branding uploads => 204; user => 403
+5. UI routes
+   - `admin/*-ui` accesible sólo para admin/root; user => 403
+6. Rate limit y AJAX
+   - Mutaciones sin cabecera AJAX rechazan (según middleware `ajax`)
+   - Ráfagas sobre `throttle:admin` responden con limit correspondiente
+
+## Casos E2E candidatos (issue #5)
+
+- Login con admin y verificación de visibilidad condicional en Users/Roles/Settings.
+- Intentar acción bloqueada (e.g., borrar rol sin permiso) y confirmar feedback UI + 403 backend.
+- Navegar con user básico a rutas admin y validar redirección/error adecuado.
+- Branding uploads (feliz y error por permiso).
+
+## Registro de ejecución
+
+- Fecha de verificación: ____
+- Commit base: ____
+- Resultado: Passed / Failed (detallar casos fallidos y enlaces a issues)
